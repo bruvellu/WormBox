@@ -1,0 +1,209 @@
+/* WormBox */
+
+macro "Unused Tool - " {}
+
+macro "Load ROI for image Action Tool - C262 T0808l T2808o T8808a Tc808d P2c3e4d5c6f7d8e9caebdcfddecff0" {
+    loadWorm();
+}
+macro "Load ROI for image [1]" {
+    loadWorm();
+}
+
+macro "Save image data Action Tool - C622 T0808s T5808a Ta808v Tc808e P2c3e4d5c6f7d8e9caebdcfddecff0" {
+    saveWorm();
+}
+macro "Save image data [2]" {
+    saveWorm();
+}
+
+function getFilename(title) {
+    // Parse window title to get filename without extension.
+    //XXX Issue warning if filename has more than 2 "."?
+    temp = split(title, ".");
+    name = temp[0];
+    return name;
+}
+
+function getExtension(title) {
+    // Parse window title to get filename without extension.
+    temp = split(title, ".");
+    extension = temp[temp.length-1];
+    if (extension != "tif" || extension != "TIF") {
+        showMessage("Warning", title + " is not a TIFF file. After measurements, it \nwill be saved as .tif to keep scale and landmark data.");
+    }
+    return extension;
+}
+
+function isScaled(title) {
+    // Check if a scale has been set on the current image.
+    selectImage(title);
+    getPixelSize(unit, pixelWidth, pixelHeight, pixelDepth);
+    //TODO Check if unit is set and force user to update.
+    if (pixelWidth == 1 || pixelWidth == 1 || unit == "pixels" || unit == "" || unit == " ") {
+        waitForUser("Critical issue!", "It looks like " + title + " scale \nis not set or the unit name is missing:\n \nPixel width: " + pixelWidth + "\nPixel height: " + pixelHeight + "\nPixel depth: " + pixelDepth + "\nUnit: " + unit + "\n \nWith this window open, set the scale using \nAnalyse > Set Scale... and then hit OK to continue.");
+        getPixelSize(unit, pixelWidth, pixelHeight, pixelDepth);
+        if (pixelWidth == 1 || pixelWidth == 1 || unit == "pixels" || unit == "" || unit == " ") {
+            exit("Scale was not set. Impossible to continue... \nSet the scale before running WormBox again. Bye!");
+        }
+    }
+}
+
+function getHeightUnit() {
+    height = getHeight();
+    hUnit = height / n;
+    return hUnit - hUnit/2;
+}
+
+function loadWorm() {
+    // Should be run after image is opened.
+    //
+    // Check if the image was scaled, ask user if not.
+    // Try to load the landmarks: image ROI, default ROI, or get input from 
+    // user to build a default ROI; in this order.
+    //
+    // Let user modify landmarks.
+
+    requires("1.45m");
+
+    //// Initializing.
+
+    //XXX useful to get image id?
+    //imageId = getImageID();
+
+    // Read window title to get the image name.
+    title = getTitle();
+    // Image should be scaled.
+    isScaled(title);
+    extension = getExtension(title);
+
+    //// Define some variables.
+
+    // Purge extension.
+    name = getFilename(title);
+
+    // Get image folder.
+    dir = getDirectory("image");
+
+    // Define full image path without extension.
+    namePath = dir + name;
+
+    // Define ROI file for image.
+    roiset = name + ".zip";
+    // Define path to ROI file.
+    roisetPath = dir + roiset;
+
+    // Define template ROI filename.
+    roiTemplate = "RoiSet.zip";
+    // Define template ROI path.
+    roiTemplatePath = dir + roiTemplate;
+
+    //// Begin.
+
+    // Clear selection before anything.
+    run("Select None");
+    // Load ROI Manager with "show all" and "name as labels".
+    run("ROI Manager...");
+    roiManager("UseNames", "true");
+    roiManager("Show All");
+    roiManager("Show All with labels");
+
+    // Try to open image roi, then default template, else provide a new 
+    // template.
+    if (File.exists(roisetPath)) {
+        // Load image ROI file "filename.zip"
+        roiManager("Open", roisetPath);
+    } else {
+        if (File.exists(roiTemplatePath)) {
+            // Load default template "RoiSet.zip"
+            roiManager("Open", roiTemplatePath);
+        } else {
+            // Call default template builder.
+            Dialog.create("Create a template");
+            Dialog.addNumber("Number of landmarks", 10);
+            Dialog.show();
+            n = Dialog.getNumber();
+            // Get image dimensions to calculate unit.
+            width = getWidth();
+            wUnit = width / n;
+            hUnit = getHeightUnit();
+            //XXX Small image dimensions might overflow landmarks.
+            for (i=0; i<n; i++) {
+                makePoint(wUnit, hUnit*(i+1));
+                roiManager("Add");
+                roiManager("Select", i);
+                roiManager("Rename", i+1);
+            }
+            roiManager("Deselect");
+            roiManager("Save", roiTemplatePath);
+        }
+    }
+}
+
+function saveWorm() {
+    // Save landmarks to ROI and to a text file for posterior analysis.
+
+    //Prepare.
+    // Set decimal to 3.
+    run("Set Measurements...", "display redirect=None decimal=3");
+    // Set defaults for data output with numbered rows (copy_row).
+    run("Input/Output...", "jpeg=75 gif=-1 file=.txt copy_row");
+
+    //// Define some variables.
+
+    // Read window title to get the image name.
+    title = getTitle();
+    // Parsing title to purge extension.
+    name = getFilename(title);
+    // Get image folder.
+    dir = getDirectory("image");
+    // Define full image path without extension.
+    namePath = dir + name;
+    // Build path to data file.
+    filePath = namePath + ".txt";
+
+    //// Begin.
+
+    // Deselect items on the list.
+    roiManager("Deselect");
+    // Save ROI for the image.
+    roiManager("Save", namePath + ".zip");
+    //XXX Ask user to save as default template?
+
+    // Calculate measurements.
+    roiManager("Measure");
+    // Focus Results window
+    selectWindow("Results");
+    // Finally save measurements.
+    saveAs("measurements", filePath);
+    // Disable ROI Manager points.
+    roiManager("Show None");
+
+    // [DEPRECATED] Save landmarks to file (must be TIFF).
+    // Never save landmarks to file, save them as ROI instead
+    // to keep names (saving to file will make them sequential).
+    //n = roiManager("count");
+    //xs = newArray(n);
+    //ys = newArray(n);
+    //getPixelSize(unit, pw, ph, pd);
+    //// Build arrays with coordinates.
+    //for (i=0; i<n; i++) {
+    //    x_value = getResult("X", i);
+    //    xs[i] = x_value / pw;
+    //    y_value = getResult("Y", i);
+    //    ys[i] = y_value / pw;
+    //}
+    //// Create selection.
+    //makeSelection("point", xs, ys);
+
+    // Close windows.
+    selectWindow("Results");
+    run("Close");
+    selectWindow("ROI Manager");
+    run("Close");
+
+    // Save image as TIFF.
+    selectWindow(title);
+    //XXX Makes lowercase TIF > tif. Ideally it should preserve the extension.
+    saveAs("tiff", namePath);
+}
+

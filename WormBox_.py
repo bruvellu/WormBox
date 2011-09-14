@@ -12,10 +12,10 @@ class Aspect:
 
     landmark_sets is a list of lists of Landmark instances.
     '''
-    def __init__(self, id, name, landmark_names):
+    def __init__(self, id, name):
         self.id = id
         self.name = name
-        self.landmark_names = landmark_names
+        self.landmark_names = []
         self.landmarks = []
         self.value = None
         self.sd = None #XXX Not needed, I think.
@@ -118,6 +118,8 @@ def import_data(folder):
     Scans folder for .txt files and returns paths as list.
     '''
     #TODO Try to import data directly from the image ROI set.
+    # try: rois = RoiManager.getInstance().getRoisAsArray()
+    # but apparently without scale...
     datafiles = []
     for file in os.listdir(folder):
         if file.endswith('.txt'):
@@ -212,7 +214,8 @@ def parse_config(images):
             for k, image in images.iteritems():
                 lm_keys = image.landmarks.keys()
                 # Create individual Aspect instance.
-                aspect = Aspect(aspect_id, aspect_name, landmark_names)
+                aspect = Aspect(aspect_id, aspect_name)
+                aspect.landmark_names = landmark_names
                 # Connect aspects with landmarks and calculate.
                 for lm_name in landmark_names:
                     if lm_name in lm_keys:
@@ -221,7 +224,9 @@ def parse_config(images):
                 image.add_aspect(aspect)
 
             # Save a separate instance for writing results.
-            aspects.append(Aspect(aspect_id, aspect_name, landmark_names))
+            template_aspect = Aspect(aspect_id, aspect_name)
+            template_aspect.landmark_names = landmark_names
+            aspects.append(template_aspect)
 
             ## Add instance to dictionary.
             #aspects[aspect_id] = aspect
@@ -404,16 +409,6 @@ try:
 except:
     IJ.error('No config file was found at %s' % config_filepath)
     config = None
-
-
-#TODO Check if lm names are correct in the config file.
-#TODO Conditional for comments.
-#TODO Formato para o arquivo de resultados:
-#   image,aspect1,aspect2,aspect3
-#   1.tif,width,height,perimeter,side(mean)
-#   ...
-#   mean,value,value,value
-#   sd,value,value,value
 
 # Only run if config file was successfully loaded.
 if config:

@@ -160,6 +160,8 @@ function saveWorm() {
     namePath = dir + name;
     // Build path to data file.
     filePath = namePath + ".txt";
+    //XXX Instead of saving a TXT, why not use the ROI ZIP directly at the 
+    //WormBox_.py plugin?
 
     //// Begin.
 

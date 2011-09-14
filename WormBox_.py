@@ -220,7 +220,8 @@ def parse_config(images):
                 aspect.calculate()
                 image.add_aspect(aspect)
 
-            aspects.append(aspect_id)
+            # Save a separate instance for writing results.
+            aspects.append(Aspect(aspect_id, aspect_name, landmark_names))
 
             ## Add instance to dictionary.
             #aspects[aspect_id] = aspect
@@ -248,45 +249,110 @@ def get_results_filename():
 
 def write_results(output):
     '''Write data to output file.'''
-    #FIXME URGENTE!
+    # Write header removing duplicate aspects (will showthe mean values).
+    aspect_names = [aspect.name for aspect in aspects]
+    aspect_names = list(set(aspect_names))
+    output.write('image,%s\n' % ','.join(aspect_names))
+
+    # Storing values from all images to calculate the mean/sd.
     data = {}
-    for k, image in images.iteritems():
+    # Prepopulating with empty list.
+    for name in aspect_names:
+        data[name] = []
+
+    ordered_images = [images[k] for k in sorted(images.keys())]
+    for image in ordered_images:
+        # Write filename.
         output.write(image.filename)
-        # Use list of aspects to write in the correct order.
-        for aspect_id in aspects:
-            data[aspect_id] = []
-            for k, aspect in image.aspects.iteritems():
-                if aspect.id == aspect_id:
-                    if not aspect.value == 'NA':
-                        data[aspect_id].append(aspect.value)
-                    output.write(',' + str(aspect.value))
+        # Local data to calculate pseudoreplicate means, if any.
+        image_data = {}
+        # Populate image data with raw values.
+        for k, aspect in image.aspects.iteritems():
+            if image_data.has_key(aspect.name):
+                image_data[aspect.name].append(aspect.value)
+            else:
+                image_data[aspect.name] = [aspect.value]
+        # Order data according to aspect names list.
+        ordered_image_data = [(k, image_data[k]) for k in aspect_names]
+        # Iterate over image data and conditionally calculate means.
+        for sample in ordered_image_data:
+            name, values = sample[0], sample[1]
+            if len(values) > 1:
+                # Strip NAs
+                values = [value for value in values if value != 'NA']
+                # Try, because it could be a list full of NAs...
+                try:
+                    value = sum(values) / len(values)
+                except:
+                    value = 'NA'
+                data[name].append(value)
+            else:
+                value = values[0]
+                data[name].append(value)
+            output.write(',' + str(value))
         output.write('\n')
 
-    output.write('mean')
-    std_devs = []
-    ns = []
-    print data
-    for aspect_id in aspects:
-        values = data[aspect_id]
-        print values
-        # Save n for next line.
+    # Sort data according to aspect names list and use a bundled list 
+    # comprehension to exclude NA values.
+    ordered_data = [[value for value in data[k] if value != 'NA'] for k in aspect_names]
+    n_samples, means, std_devs = [], [], []
+    for values in ordered_data:
+        # Define values.
         n = len(values)
-        ns.append(n)
-        # Calculate mean.
-        print sum(values), n
         mean = sum(values) / n
-        output.write(',' + str(mean))
-        # Save standard deviation for next line.
         sd = get_sd(values)
-        std_devs.append(sd)
-    output.write('\n')
-    output.write('sd')
-    for sd in std_devs:
-        output.write(',' + str(sd))
-    output.write('\n')
-    output.write('n')
-    for n in ns:
-        output.write(',' + str(n))
+        # Append to lists.
+        n_samples.append(str(n))
+        means.append(str(mean))
+        std_devs.append(str(sd))
+
+    # Write means.
+    output.write('mean,%s\n' % ','.join(means))
+    # Write standard deviations.
+    output.write('sd,%s\n' % ','.join(std_devs))
+    # Write n samples.
+    output.write('n,%s\n' % ','.join(n_samples))
+
+
+
+
+
+    #if aspect.id == aspect_id:
+    #    if not aspect.value == 'NA':
+    #        data[aspect_id].append(aspect.value)
+    #    output.write(',' + str(aspect.value))
+
+
+    #output.write(image.filename)
+    ## Use list of aspects to write in the correct order.
+    #for aspect_id in aspects:
+    #    data[aspect_id] = []
+
+    #output.write('mean')
+    #std_devs = []
+    #ns = []
+    #print data
+    #for aspect_id in aspects:
+    #    values = data[aspect_id]
+    #    print values
+    #    # Save n for next line.
+    #    n = len(values)
+    #    ns.append(n)
+    #    # Calculate mean.
+    #    print sum(values), n
+    #    mean = sum(values) / n
+    #    output.write(',' + str(mean))
+    #    # Save standard deviation for next line.
+    #    sd = get_sd(values)
+    #    std_devs.append(sd)
+    #output.write('\n')
+    #output.write('sd')
+    #for sd in std_devs:
+    #    output.write(',' + str(sd))
+    #output.write('\n')
+    #output.write('n')
+    #for n in ns:
+    #    output.write(',' + str(n))
 
     #output.write('aspect,value,sd\n')
     #final_results = {}
@@ -373,7 +439,6 @@ if config:
     if not output:
         IJ.showMessage('Error!', 'Could not write to:\n \n%s' % 
                 results_filepath)
-    output.write('image,%s\n' % ','.join(aspects))
     write_results(output)
     output.close()
     IJ.showMessage('Done!', 'See your results at:\n \n%s' % results_filepath)

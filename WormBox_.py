@@ -12,16 +12,17 @@ class Aspect:
 
     landmark_sets is a list of lists of Landmark instances.
     '''
-    def __init__(self, id):
+    def __init__(self, id, name, landmark_names):
         self.id = id
-        self.name = id.split(',')[0]
-        self.landmark_sets = []
+        self.name = name
+        self.landmark_names = landmark_names
+        self.landmarks = []
         self.value = None
         self.sd = None
 
     def add_landmark(self, landmark):
         '''Attach a landmark object to aspect.'''
-        self.landmark_sets.append(landmark)
+        self.landmarks.append(landmark)
 
     def get_distance(self, lm_1, lm_2):
         '''Calculate distance between 2 landmarks.'''
@@ -50,21 +51,29 @@ class Aspect:
 
 
 class Image:
-    '''Defines an image file.'''
+    '''Defines an image file and store landmarks and aspects.
+
+    Landmark and Aspect objects are stored in dictionaries where the keys are 
+    their names and unique ids, respectively.
+    '''
     def __init__(self, filename):
         self.filename = filename
-        self.landmarks = []
+        self.landmarks = {}
+        self.aspects = {}
 
     def add_landmark(self, landmark):
         '''Attach a landmark object to image.'''
-        self.landmarks.append(landmark)
+        self.landmarks[landmark.name] = landmark
+
+    def add_aspect(self, aspect):
+        '''Attach an aspect object to image.'''
+        self.aspects[aspect.id] = aspect
 
 
 class Landmark:
     '''A landmark data point.'''
-    def __init__(self, name, x, y, image):
+    def __init__(self, name, x, y):
         self.name = name
-        self.image = image
         self.x = float(x)
         self.y = float(y)
 
@@ -109,21 +118,21 @@ def parse_data(datafiles):
             # Define landmark data and objects.
             names = datalist[0].split(':')
             filename = names[0]
-            lm_name = names[1].strip(' ')
-            lm_x = datalist[1]
-            lm_y = datalist[2]
+            landmark_name = names[1].strip(' ')
+            landmark_x = datalist[1]
+            landmark_y = datalist[2]
 
             # Try to catch opened instance with filename.
             try:
-                image = images[names[0]]
+                image = images[filename]
             except:
                 # Create image instance instead.
-                image = Image(names[0])
+                image = Image(filename)
                 # Add image instance to dictionary.
                 images[image.filename] = image
 
             # Instantiate landmark object.
-            landmark = Landmark(lm_name, lm_x, lm_y, image)
+            landmark = Landmark(landmark_name, landmark_x, landmark_y)
             # Attach landmark to image.
             image.add_landmark(landmark)
 
@@ -151,8 +160,6 @@ def parse_config(images):
             - "width : left ,far right ,  back"
             - "width:left,far right,back"
     '''
-    aspects = {}
-
     for line in config.readlines():
         if not line.startswith('#'):
             #TODO Error handling in general, parsing may fail, config file 
@@ -166,24 +173,29 @@ def parse_config(images):
             # Define aspect name stripping whitespace.
             aspect_name = split_line[0].strip(' ')
             # Split landmarks and strip whitespace.
-            lm_names = [name.strip(' ') for name in split_line[1].split(',')]
-
+            landmark_names = [name.strip(' ') for name in 
+                    split_line[1].split(',')]
             # Define Aspect id (eg "name:lm1,lm2").
-            aspect_id = aspect_name + ':' + ','.join(lm_names)
-            # Create Aspect instance.
-            aspect = Aspect(aspect_id)
-            # Add instance to dictionary.
-            aspects[aspect_id] = aspect
+            aspect_id = aspect_name + ':' + ','.join(landmark_names)
 
-            # Get related landmarks from images.
+            # Add aspect to images.
             for k, image in images.iteritems():
-                lm_list = []
-                for landmark in image.landmarks:
-                    if landmark.name in lm_names:
-                        lm_list.append(landmark)
-                aspect.add_landmark(lm_list)
+                # Create Aspect instance.
+                aspect = Aspect(aspect_id, aspect_name, landmark_names)
+                image.add_aspect(aspect)
 
-    return aspects
+            ## Add instance to dictionary.
+            #aspects[aspect_id] = aspect
+
+            ## Get related landmarks from images.
+            #for k, image in images.iteritems():
+            #    lm_list = []
+            #    for landmark in image.landmarks:
+            #        if landmark.name in lm_names:
+            #            lm_list.append(landmark)
+            #    aspect.add_landmark(lm_list)
+
+    return images
 
 def get_results_filename():
     '''Prompt the user to suggest name of the output file.'''
@@ -195,6 +207,40 @@ def get_results_filename():
         return None
     #TODO Check if file exists before and try again?
     return name + '.csv'
+
+def write_results(images, output):
+    '''Write data to output file.'''
+    for k, image in images.iteritems():
+        print
+        print image.filename
+        #print 'LANDMARKS'
+        #for k, landmark in image.landmarks.iteritems():
+        #    print landmark.name, landmark.x, landmark.y
+        for k, aspect in image.aspects.iteritems():
+            print
+            print aspect.name, aspect.landmark_names
+            for lm in aspect.landmarks:
+                print lm.name, lm.x, lm.y
+    #output.write('aspect,value,sd\n')
+    #final_results = {}
+    ## Calculate values and add to the final dictionary.
+    #for k, aspect in aspects.iteritems():
+    #    aspect.calculate()
+    #    if final_results.has_key(aspect.name):
+    #        final_results[aspect.name].append(aspect)
+    #    else:
+    #        final_results[aspect.name] = [aspect]
+    ## Necessary to compilate pseudoreplicates.
+    #for k, v in final_results.iteritems():
+    #    if len(v) > 1:
+    #        values = [aspect.value for aspect in v]
+    #        mean = sum(values)/len(v)
+    #        sd = get_sd(values)
+    #        results.write('%s,%f,%f\n' % (k, mean, sd))
+    #    else:
+    #        aspect = v[0]
+    #        results.write('%s,%f,%f\n' % (aspect.name, aspect.value, 
+    #            aspect.sd))
 
 def get_sd(distances):
     '''Calculate standard deviation between distances.'''
@@ -245,34 +291,31 @@ if config:
     images = parse_data(datafiles)
 
     # Parse config file and create Aspect instances.
-    aspects = parse_config(images)
+    images = parse_config(images)
+
+    # Connect aspects with landmarks and calculate.
+    for k, image in images.iteritems():
+        for k, aspect in image.aspects.iteritems():
+            for name in aspect.landmark_names:
+                try:
+                    aspect.add_landmark(image.landmarks[name])
+                    print image.filename, aspect.name, name
+                except:
+                    print 'Landmark %s absent from %s' % (name, image.filename)
 
     # Raise dialog to get name for results file.
     results_filename = get_results_filename()
-    if results_filename:
-        results_filepath = os.path.join(folder, results_filename)
-        results = open(results_filepath, 'wb')
-        results.write('aspect,value,sd\n')
-        final_results = {}
-        # Calculate values and add to the final dictionary.
-        for k, aspect in aspects.iteritems():
-            aspect.calculate()
-            if final_results.has_key(aspect.name):
-                final_results[aspect.name].append(aspect)
-            else:
-                final_results[aspect.name] = [aspect]
-        # Necessary to compilate pseudoreplicates.
-        for k, v in final_results.iteritems():
-            if len(v) > 1:
-                values = [aspect.value for aspect in v]
-                mean = sum(values)/len(v)
-                sd = get_sd(values)
-                results.write('%s,%f,%f\n' % (k, mean, sd))
-            else:
-                aspect = v[0]
-                results.write('%s,%f,%f\n' % (aspect.name, aspect.value, 
-                    aspect.sd))
-        results.close()
-        IJ.showMessage('Done!', 'See your results at:\n \n%s' % results_filepath)
-    else:
-        IJ.showMessage('Aborting...', 'Output file not specified (last dialog was cancelled).')
+    if not results_filename:
+        IJ.showMessage('Aborting...',
+                'Output file not specified (last dialog was cancelled).')
+    results_filepath = os.path.join(folder, results_filename)
+    try:
+        output = open(results_filepath, 'wb')
+    except IOError:
+        output = None
+    if not output:
+        IJ.showMessage('Error!', 'Could not write to:\n \n%s' % 
+                results_filepath)
+    write_results(images, output)
+    output.close()
+    IJ.showMessage('Done!', 'See your results at:\n \n%s' % results_filepath)

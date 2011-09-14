@@ -165,6 +165,15 @@ function saveWorm() {
 
     //// Begin.
 
+    //TODO Ask here if user wants to count something!!!
+    counting = getBoolean("Do you want to count structures?");
+    if (counting == true) {
+        setTool("multipoint");
+        waitForUser("Click on the image to count and press OK");
+        setKeyDown("alt");
+        roiManager("Add");
+    }
+
     // Deselect items on the list.
     roiManager("Deselect");
     // Save ROI for the image.

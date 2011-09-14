@@ -1,5 +1,7 @@
 import os
+import sys
 from ij import IJ
+from ij.gui import GenericDialog
 from math import sqrt
 
 ## CLASSES ##
@@ -153,15 +155,18 @@ def parse_config(images):
 
     for line in config.readlines():
         if not line.startswith('#'):
+            #TODO Error handling in general, parsing may fail, config file 
+            # might not be in the appropriate format!
             # Strip newlines.
             this_line = line.strip('\n')
             # Split at the aspect name.
+            #TODO Check if landmarks have ":" in their names?
             split_line = this_line.split(':')
 
             # Define aspect name stripping whitespace.
             aspect_name = split_line[0].strip(' ')
             # Split landmarks and strip whitespace.
-            lm_names = [name.strip(' ') for name in split_line.split(',')]
+            lm_names = [name.strip(' ') for name in split_line[1].split(',')]
 
             # Define Aspect id (eg "name:lm1,lm2").
             aspect_id = aspect_name + ':' + ','.join(lm_names)
@@ -179,6 +184,17 @@ def parse_config(images):
                 aspect.add_landmark(lm_list)
 
     return aspects
+
+def get_results_filename():
+    '''Prompt the user to suggest name of the output file.'''
+    dialog = GenericDialog('Output results file')
+    dialog.addStringField('Choose name without extension:', 'results')
+    dialog.showDialog()
+    name = dialog.getNextString()
+    if dialog.wasCanceled():
+        return None
+    #TODO Check if file exists before and try again?
+    return name + '.csv'
 
 def get_sd(distances):
     '''Calculate standard deviation between distances.'''
@@ -231,29 +247,32 @@ if config:
     # Parse config file and create Aspect instances.
     aspects = parse_config(images)
 
-    #TODO Fazer input para mudar o nome do arquivo dos resultados.
-    # Pede nome do arquivo, se já existir avisa, sem extensão.
-    results_filepath = os.path.join(folder, 'results.csv')
-    results = open(results_filepath, 'wb')
-    results.write('aspect,value,sd\n')
-    final_results = {}
-    # Calculate values and add to the final dictionary.
-    for k, aspect in aspects.iteritems():
-        aspect.calculate()
-        if final_results.has_key(aspect.name):
-            final_results[aspect.name].append(aspect)
-        else:
-            final_results[aspect.name] = [aspect]
-    # Necessary to compilate pseudoreplicates.
-    for k, v in final_results.iteritems():
-        if len(v) > 1:
-            values = [aspect.value for aspect in v]
-            mean = sum(values)/len(v)
-            sd = get_sd(values)
-            results.write('%s,%f,%f\n' % (k, mean, sd))
-        else:
-            aspect = v[0]
-            results.write('%s,%f,%f\n' % (aspect.name, aspect.value, 
-                aspect.sd))
-    results.close()
-    IJ.showMessage('Done!', 'See your results at:\n \n%s' % results_filepath)
+    # Raise dialog to get name for results file.
+    results_filename = get_results_filename()
+    if results_filename:
+        results_filepath = os.path.join(folder, results_filename)
+        results = open(results_filepath, 'wb')
+        results.write('aspect,value,sd\n')
+        final_results = {}
+        # Calculate values and add to the final dictionary.
+        for k, aspect in aspects.iteritems():
+            aspect.calculate()
+            if final_results.has_key(aspect.name):
+                final_results[aspect.name].append(aspect)
+            else:
+                final_results[aspect.name] = [aspect]
+        # Necessary to compilate pseudoreplicates.
+        for k, v in final_results.iteritems():
+            if len(v) > 1:
+                values = [aspect.value for aspect in v]
+                mean = sum(values)/len(v)
+                sd = get_sd(values)
+                results.write('%s,%f,%f\n' % (k, mean, sd))
+            else:
+                aspect = v[0]
+                results.write('%s,%f,%f\n' % (aspect.name, aspect.value, 
+                    aspect.sd))
+        results.close()
+        IJ.showMessage('Done!', 'See your results at:\n \n%s' % results_filepath)
+    else:
+        IJ.showMessage('Aborting...', 'Output file not specified (last dialog was cancelled).')

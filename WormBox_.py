@@ -2,6 +2,7 @@ import os
 import sys
 from ij import IJ
 from ij.gui import GenericDialog
+from ij.io import OpenDialog
 from math import sqrt
 
 ## CLASSES ##
@@ -128,7 +129,7 @@ def import_datafiles(folder):
     # but apparently without scale...
     datafiles = []
     for file in os.listdir(folder):
-        if file.endswith('.txt'):
+        if file.endswith('_data.txt'):
             datafiles.append(os.path.join(folder, file))
     return datafiles
 
@@ -318,7 +319,6 @@ def write_results(output):
     # comprehension to exclude NA values.
     ordered_data = [[value for value in data[k] if value != 'NA'] for k in labels]
     n_samples, means, std_devs = [], [], []
-    print ordered_data
     for values in ordered_data:
         # Define values.
         n = len(values)
@@ -346,28 +346,52 @@ def get_sd(distances):
     sd = sqrt(sum(sums) / n)
     return sd
 
+def get_config_file(folder):
+    '''Returns the config file name.'''
+    # Get list of files in the selected directory.
+    files = os.listdir(folder)
+
+    # Check if a config file is present in folder.
+    if default_config in files:
+        dialog = GenericDialog('Default config file found!')
+        dialog.addMessage('Use this file for the analysis?\n \n%s' % os.path.join(folder, default_config))
+        dialog.enableYesNoCancel()
+        dialog.showDialog()
+        if dialog.wasCanceled():
+            return None
+        elif dialog.wasOKed():
+            return default_config
+        else:
+            open_dialog = OpenDialog('Select a config file', folder, default_config)
+            return open_dialog.getFileName()
+    else:
+        # Ask user to select a config file.
+        open_dialog = OpenDialog('Select a config file', folder, default_config)
+        return open_dialog.getFileName()
+
+
 ## MAIN FUNCTION ##
 
 #imp = IJ.getImage()
+default_config = 'config.txt'
 
 # Get directory of open image or prompt user to choose.
 folder = IJ.getDirectory('image')
 if not folder:
     folder = IJ.getDirectory('Select a folder')
 
-#TODO Check if a config file is present and raise dialog.
-#TODO User can decide to use this file or pick a different one.
+config_filename = get_config_file(folder)
 
-# Define configuration file and path.
-#TODO Let user choose a configuration file anywhere with any name.
-config_filename = 'config'
-config_filepath = os.path.join(folder, config_filename)
-
-# Load the config file or abort.
-try:
-    config = open(config_filepath)
-except:
-    IJ.error('No config file was found at %s' % config_filepath)
+if config_filename:
+    config_filepath = os.path.join(folder, config_filename)
+    # Load the config file or abort.
+    try:
+        config = open(config_filepath)
+    except:
+        IJ.error('Could not open config file %s' % config_filepath)
+        config = None
+else:
+    IJ.error('No config file was specified, aborting...')
     config = None
 
 # Only run if config file was successfully loaded.

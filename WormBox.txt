@@ -146,7 +146,7 @@ function saveWorm() {
     // Set decimal to 3.
     run("Set Measurements...", "display redirect=None decimal=3");
     // Set defaults for data output with numbered rows (copy_row).
-    run("Input/Output...", "jpeg=75 gif=-1 file=.txt copy_row");
+    run("Input/Output...", "jpeg=75 gif=-1 file=.txt use copy_row");
 
     //// Define some variables.
 

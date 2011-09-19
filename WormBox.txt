@@ -168,6 +168,7 @@ function saveWorm() {
     //TODO Ask here if user wants to count something!!!
     counting = getBoolean("Do you want to count structures?");
     if (counting == true) {
+        run("Select None");
         setTool("multipoint");
         waitForUser("Click on the image to count and press OK");
         setKeyDown("alt");

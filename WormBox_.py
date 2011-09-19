@@ -15,10 +15,20 @@ class Aspect:
     def __init__(self, id, name):
         self.id = id
         self.name = name
-        self.landmark_names = []
+        self.landmarks_names = []
         self.landmarks = []
         self.value = None
-        self.sd = None #XXX Not needed, I think.
+        self.meristic = False
+
+    def connect_landmarks(self, image):
+        '''Connect selected landmarks from an image to aspect.'''
+        for name in self.landmarks_names:
+            for k, landmark in image.landmarks.iteritems():
+                if name == landmark.name:
+                    self.add_landmark(landmark)
+                elif name == 'count' and landmark.name == self.name:
+                    self.add_landmark(landmark)
+                    self.meristic = True
 
     def add_landmark(self, landmark):
         '''Attach a landmark object to aspect.'''
@@ -38,45 +48,33 @@ class Aspect:
         '''
         if self.check():
             # Passed the test.
-            distances = []
-            n = len(self.landmarks)
-            for i, landmark in enumerate(self.landmarks):
-                # Only run if not in the last iteration.
-                if not i + 2 > n:
-                    distance = self.get_distance(landmark,
-                            self.landmarks[i + 1])
-                    distances.append(distance)
-            self.value = sum(distances)
-            # Calculate standard deviation if more than 2 items.
-            #XXX Not needed, I think.
-            #if n > 2:
-            #    self.sd = get_sd(distances)
-            #else:
-            #    self.sd = 'NA'
+            if self.meristic:
+                self.value = len(self.landmarks)
+            else:
+                distances = []
+                n = len(self.landmarks)
+                for i, landmark in enumerate(self.landmarks):
+                    # Only run if not in the last iteration.
+                    if not i + 2 > n:
+                        distance = self.get_distance(landmark,
+                                self.landmarks[i + 1])
+                        distances.append(distance)
+                self.value = sum(distances)
         else:
             # Failed in the test, return NA.
             self.value = 'NA'
-            #self.sd = 'NA'
-
-        #distances = []
-        #n = len(self.landmark_sets)
-        #for lm_set in self.landmark_sets:
-        #    predistance = self.get_predistance(lm_set)
-        #    distances.append(predistance)
-        #if n > 2:
-        #    self.sd = get_sd(distances)
-        #else:
-        #    self.sd = 'NA'
-        #self.value = sum(distances)
 
     def check(self):
         '''Check if landmarks are missing.'''
-        expected = len(self.landmark_names)
-        observed = len(self.landmarks)
-        if expected == observed:
+        if self.meristic:
             return True
         else:
-            return False
+            expected = len(self.landmarks_names)
+            observed = len(self.landmarks)
+            if expected == observed:
+                return True
+            else:
+                return False
 
 
 class Image:
@@ -92,16 +90,24 @@ class Image:
 
     def add_landmark(self, landmark):
         '''Attach a landmark object to image.'''
-        self.landmarks[landmark.name] = landmark
+        self.landmarks[landmark.id] = landmark
 
     def add_aspect(self, aspect):
         '''Attach an aspect object to image.'''
         self.aspects[aspect.id] = aspect
 
+    def get_landmarks_names(self):
+        '''Return the name of attached landmarks.'''
+        names = [self.landmarks[id]['name'] for id in self.landmarks.keys()]
+        return names
+
+
+lm = { '1x0.2y0.4': { 'id': '1x0.2y0.4', 'name': '1', 'x': '0.2', 'y': '0.4' }, '2x0.1y0.5': { 'id': '2x0.1y0.5', 'name': '2', 'x': '0.1', 'y': '0.5', } }
 
 class Landmark:
     '''A landmark data point.'''
     def __init__(self, name, x, y):
+        self.id = '%sx%sy%s' % (name, x, y)
         self.name = name
         self.x = float(x)
         self.y = float(y)
@@ -112,7 +118,7 @@ class Landmark:
 
 ## FUNCTIONS ##
 
-def import_data(folder):
+def import_datafiles(folder):
     '''Import files with raw landmark data from folder.
 
     Scans folder for .txt files and returns paths as list.
@@ -144,16 +150,10 @@ def parse_data(datafiles):
     for file in datafiles:
         datafile = open(file)
         for line in datafile.readlines():
-            # Parse raw text.
-            datalist = line.split('\t')
-            # Define landmark data and objects.
-            names = datalist[0].split(':')
-            filename = names[0]
-            landmark_name = names[1].strip(' ')
-            landmark_x = datalist[1]
-            landmark_y = datalist[2]
+            # Call line parser to extract values.
+            filename, landmark_name, landmark_x, landmark_y = parse_data_line(line)
 
-            # Try to catch opened instance with filename.
+            # Try to catch opened image instance with filename.
             try:
                 image = images[filename]
             except:
@@ -166,8 +166,21 @@ def parse_data(datafiles):
             landmark = Landmark(landmark_name, landmark_x, landmark_y)
             # Attach landmark to image.
             image.add_landmark(landmark)
+        datafile.close()
 
     return images
+
+def parse_data_line(line):
+    '''Parse a single line of data and return values.'''
+    # Parse raw text.
+    datalist = line.split('\t')
+    # Define landmark data and objects.
+    names = datalist[0].split(':')
+    filename = names[0]
+    landmark_name = names[1].strip(' ')
+    landmark_x = datalist[1]
+    landmark_y = datalist[2]
+    return filename, landmark_name, landmark_x, landmark_y
 
 def parse_config(images):
     '''Read config file and instantiate aspects to be analysed.
@@ -181,65 +194,56 @@ def parse_config(images):
         perimeter:1,2,3,4,5
         side:1,2
         side:5,4
+        hooks:count
 
     Notes:
         - Aspect name ends at ":".
         - Delimiter for landmark names is ",".
         - Line starting with "#" is ignored ("#" elsewhere is not).
-        - White space before or after names are stripped, space between words 
-          are preserved. Following examples are equivalent:
+        - White space before or after names are stripped, space between words are preserved. Following examples are equivalent:
             - "width : left ,far right ,  back"
             - "width:left,far right,back"
+        - For meristic landmarks use name:count format (literal string count).
     '''
     aspects = []
     for line in config.readlines():
         if not line.startswith('#'):
-            #TODO Error handling in general, parsing may fail, config file 
-            # might not be in the appropriate format!
-            # Strip newlines.
-            this_line = line.strip('\n')
-            # Split at the aspect name.
-            #TODO Check if landmarks have ":" in their names?
-            split_line = this_line.split(':')
-
-            # Define aspect name stripping whitespace.
-            aspect_name = split_line[0].strip(' ')
-            # Split landmarks and strip whitespace.
-            landmark_names = [name.strip(' ') for name in 
-                    split_line[1].split(',')]
-            # Define Aspect id (eg "name:lm1,lm2").
-            aspect_id = aspect_name + ':' + ','.join(landmark_names)
+            # Parse config line and return values.
+            aspect_id, aspect_name, aspect_landmarks_names = parse_config_line(line)
 
             # Add aspects to images.
             for k, image in images.iteritems():
-                lm_keys = image.landmarks.keys()
                 # Create individual Aspect instance.
                 aspect = Aspect(aspect_id, aspect_name)
-                aspect.landmark_names = landmark_names
-                # Connect aspects with landmarks and calculate.
-                for lm_name in landmark_names:
-                    if lm_name in lm_keys:
-                        aspect.add_landmark(image.landmarks[lm_name])
+                aspect.landmarks_names = aspect_landmarks_names
+                aspect.connect_landmarks(image)
                 aspect.calculate()
                 image.add_aspect(aspect)
 
             # Save a separate instance for writing results.
             template_aspect = Aspect(aspect_id, aspect_name)
-            template_aspect.landmark_names = landmark_names
             aspects.append(template_aspect)
 
-            ## Add instance to dictionary.
-            #aspects[aspect_id] = aspect
-
-            ## Get related landmarks from images.
-            #for k, image in images.iteritems():
-            #    lm_list = []
-            #    for landmark in image.landmarks:
-            #        if landmark.name in lm_names:
-            #            lm_list.append(landmark)
-            #    aspect.add_landmark(lm_list)
-
     return aspects
+
+def parse_config_line(line):
+    '''Parse a single line of the config file and return values.'''
+    #TODO Error handling in general, parsing may fail, config file 
+    # might not be in the appropriate format!
+    # Strip newlines.
+    this_line = line.strip('\n')
+    # Split at the aspect name.
+    #TODO Check if landmarks have ":" in their names?
+    split_line = this_line.split(':')
+
+    # Define aspect name stripping whitespace.
+    name = split_line[0].strip(' ')
+    # Split landmarks and strip whitespace.
+    landmarks_names = [lm.strip(' ') for lm in split_line[1].split(',')]
+    # Define Aspect id (eg "name:lm1,lm2").
+    id = name + ':' + ','.join(landmarks_names)
+
+    return id, name, landmarks_names
 
 def get_results_filename():
     '''Prompt the user to suggest name of the output file.'''
@@ -252,20 +256,33 @@ def get_results_filename():
     #TODO Check if file exists before and try again?
     return name + '.csv'
 
+def build_header(aspect_names):
+    '''Constructs ordered header labels removing duplicates.'''
+    known = set()
+    labels = []
+    for name in aspect_names:
+        if name in known:
+            continue
+        labels.append(name)
+        known.add(name)
+    return labels
+
 def write_results(output):
     '''Write data to output file.'''
-    # Write header removing duplicate aspects (will showthe mean values).
+    # Write header removing duplicate aspects (will show the mean values).
     aspect_names = [aspect.name for aspect in aspects]
-    aspect_names = list(set(aspect_names))
-    output.write('image,%s\n' % ','.join(aspect_names))
+    labels = build_header(aspect_names)
+    output.write('image,%s\n' % ','.join(labels))
 
     # Storing values from all images to calculate the mean/sd.
     data = {}
     # Prepopulating with empty list.
-    for name in aspect_names:
+    for name in labels:
         data[name] = []
 
+    # Just sorting images by name.
     ordered_images = [images[k] for k in sorted(images.keys())]
+
     for image in ordered_images:
         # Write filename.
         output.write(image.filename)
@@ -278,7 +295,7 @@ def write_results(output):
             else:
                 image_data[aspect.name] = [aspect.value]
         # Order data according to aspect names list.
-        ordered_image_data = [(k, image_data[k]) for k in aspect_names]
+        ordered_image_data = [(k, image_data[k]) for k in labels]
         # Iterate over image data and conditionally calculate means.
         for sample in ordered_image_data:
             name, values = sample[0], sample[1]
@@ -299,12 +316,13 @@ def write_results(output):
 
     # Sort data according to aspect names list and use a bundled list 
     # comprehension to exclude NA values.
-    ordered_data = [[value for value in data[k] if value != 'NA'] for k in aspect_names]
+    ordered_data = [[value for value in data[k] if value != 'NA'] for k in labels]
     n_samples, means, std_devs = [], [], []
+    print ordered_data
     for values in ordered_data:
         # Define values.
         n = len(values)
-        mean = sum(values) / n
+        mean = sum(values) / float(n)
         sd = get_sd(values)
         # Append to lists.
         n_samples.append(str(n))
@@ -318,76 +336,14 @@ def write_results(output):
     # Write n samples.
     output.write('n,%s\n' % ','.join(n_samples))
 
-
-
-
-
-    #if aspect.id == aspect_id:
-    #    if not aspect.value == 'NA':
-    #        data[aspect_id].append(aspect.value)
-    #    output.write(',' + str(aspect.value))
-
-
-    #output.write(image.filename)
-    ## Use list of aspects to write in the correct order.
-    #for aspect_id in aspects:
-    #    data[aspect_id] = []
-
-    #output.write('mean')
-    #std_devs = []
-    #ns = []
-    #print data
-    #for aspect_id in aspects:
-    #    values = data[aspect_id]
-    #    print values
-    #    # Save n for next line.
-    #    n = len(values)
-    #    ns.append(n)
-    #    # Calculate mean.
-    #    print sum(values), n
-    #    mean = sum(values) / n
-    #    output.write(',' + str(mean))
-    #    # Save standard deviation for next line.
-    #    sd = get_sd(values)
-    #    std_devs.append(sd)
-    #output.write('\n')
-    #output.write('sd')
-    #for sd in std_devs:
-    #    output.write(',' + str(sd))
-    #output.write('\n')
-    #output.write('n')
-    #for n in ns:
-    #    output.write(',' + str(n))
-
-    #output.write('aspect,value,sd\n')
-    #final_results = {}
-    ## Calculate values and add to the final dictionary.
-    #for k, aspect in aspects.iteritems():
-    #    aspect.calculate()
-    #    if final_results.has_key(aspect.name):
-    #        final_results[aspect.name].append(aspect)
-    #    else:
-    #        final_results[aspect.name] = [aspect]
-    ## Necessary to compilate pseudoreplicates.
-    #for k, v in final_results.iteritems():
-    #    if len(v) > 1:
-    #        values = [aspect.value for aspect in v]
-    #        mean = sum(values)/len(v)
-    #        sd = get_sd(values)
-    #        results.write('%s,%f,%f\n' % (k, mean, sd))
-    #    else:
-    #        aspect = v[0]
-    #        results.write('%s,%f,%f\n' % (aspect.name, aspect.value, 
-    #            aspect.sd))
-
 def get_sd(distances):
     '''Calculate standard deviation between distances.'''
     n = len(distances)
-    mean = sum(distances)/float(n)
+    mean = sum(distances) / float(n)
     sums = []
     for distance in distances:
         sums.append((distance - mean)**2)
-    sd = sqrt(sum(sums)/n)
+    sd = sqrt(sum(sums) / n)
     return sd
 
 ## MAIN FUNCTION ##
@@ -399,7 +355,11 @@ folder = IJ.getDirectory('image')
 if not folder:
     folder = IJ.getDirectory('Select a folder')
 
+#TODO Check if a config file is present and raise dialog.
+#TODO User can decide to use this file or pick a different one.
+
 # Define configuration file and path.
+#TODO Let user choose a configuration file anywhere with any name.
 config_filename = 'config'
 config_filepath = os.path.join(folder, config_filename)
 
@@ -413,7 +373,7 @@ except:
 # Only run if config file was successfully loaded.
 if config:
     # Get all raw datafiles from a folder.
-    datafiles = import_data(folder)
+    datafiles = import_datafiles(folder)
 
     # Extract data from text files and store in Image instances.
     images = parse_data(datafiles)
@@ -432,8 +392,7 @@ if config:
     except IOError:
         output = None
     if not output:
-        IJ.showMessage('Error!', 'Could not write to:\n \n%s' % 
-                results_filepath)
+        IJ.showMessage('Error!', 'Could not write to:\n \n%s' % results_filepath)
     write_results(output)
     output.close()
     IJ.showMessage('Done!', 'See your results at:\n \n%s' % results_filepath)

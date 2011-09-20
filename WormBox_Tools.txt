@@ -27,6 +27,8 @@ macro "Count structure data [3]" {
     saveWorm(false);
 }
 
+//TODO Write return values for all functions.
+
 function getFilename(title) {
     /*
      * Parse window title to get filename without extension.
@@ -43,17 +45,23 @@ function getFilename(title) {
 }
 
 function getExtension(title) {
-    // Parse window title to get filename without extension.
+    /*
+     * Parse window title to get the filename extension.
+     */
     temp = split(title, ".");
     extension = temp[temp.length-1];
     if (extension != "tif" || extension != "TIF") {
-        showMessage("Warning", title + " is not a TIFF file. After measurements, it \nwill be saved as .tif to keep scale and landmark data.");
+        showMessage("Warning", title + " is not a TIFF file. After measurements, it \nwill be saved as .tif to keep scale settings.");
     }
     return extension;
 }
 
 function isScaled(title) {
-    // Check if a scale has been set on the current image.
+    /*
+     * Check if a scale has been set on the current image.
+     *
+     * If not, ask user to interact.
+     */
     selectImage(title);
     getPixelSize(unit, pixelWidth, pixelHeight, pixelDepth);
     //TODO Check if unit is set and force user to update.
@@ -68,44 +76,50 @@ function isScaled(title) {
 }
 
 function count() {
+    /*
+     * Workflow to count structures in the images.
+     */
     run("Select None");
     setTool("multipoint");
-    waitForUser("Click on the image to count and press OK");
+    waitForUser("Without closing this window:\n \n1. Count the number of structures by clicking on the image.\n \n2. When finished, press OK and give a name for this structure.");
     setKeyDown("alt");
     roiManager("Add");
 }
 
 function getHeightUnit() {
+    /*
+     * Fill default landmarks within the image dimensions.
+     */
     height = getHeight();
     hUnit = height / n;
     return hUnit - hUnit/2;
 }
 
 function loadWorm() {
-    // Should be run after image is opened.
-    //
-    // Check if the image was scaled, ask user if not.
-    // Try to load the landmarks: image ROI, default ROI, or get input from 
-    // user to build a default ROI; in this order.
-    //
-    // Let user modify landmarks.
+    /*
+     * Should be run after image is opened.
+     *
+     * Check if the image was scaled, ask user if not.
+     *
+     * Try to load the landmarks: image ROI, default ROI, or get input from 
+     * user to build a default ROI; in this order.
+     *
+     * Let user modify landmarks.
+     */
 
+    // Necessary to load ROI Manager with Edit Mode activated.
     requires("1.45m");
-
-    //// Initializing.
-
-    //XXX useful to get image id?
-    //imageId = getImageID();
 
     // Read window title to get the image name.
     title = getTitle();
-    // Image should be scaled.
+
+    // Check if image is properly scaled.
     isScaled(title);
+
+    // Get extension from filename.
     extension = getExtension(title);
 
-    //// Define some variables.
-
-    // Purge extension.
+    // Get filename without extension.
     name = getFilename(title);
 
     // Get image folder.
@@ -116,18 +130,19 @@ function loadWorm() {
 
     // Define ROI file for image.
     roiset = name + ".zip";
+
     // Define path to ROI file.
     roisetPath = dir + roiset;
 
-    // Define template ROI filename.
+    // Define default ROI template filename.
     roiTemplate = "RoiSet.zip";
-    // Define template ROI path.
-    roiTemplatePath = dir + roiTemplate;
 
-    //// Begin.
+    // Define default ROI template path.
+    roiTemplatePath = dir + roiTemplate;
 
     // Clear selection before anything.
     run("Select None");
+
     // Load ROI Manager with "show all" and "name as labels".
     run("ROI Manager...");
     roiManager("UseNames", "true");
@@ -148,6 +163,7 @@ function loadWorm() {
             Dialog.create("Create a template");
             Dialog.addNumber("Number of landmarks", 10);
             Dialog.show();
+            // Get number of landmarks from the user.
             n = Dialog.getNumber();
             // Get image dimensions to calculate unit.
             width = getWidth();
@@ -167,31 +183,35 @@ function loadWorm() {
 }
 
 function saveWorm(meristic) {
-    // Save landmarks to ROI and to a text file for posterior analysis.
+    /*
+     * Save landmarks to ROI and to a text file for posterior analysis.
+     *
+     * Argument "meristic" can be "true" to prompt user to count structures or 
+     * "false" to skip this prompt.
+     */
 
-    //Prepare.
     // Set decimal to 3.
     run("Set Measurements...", "display redirect=None decimal=3");
+
     // Set defaults for data output with numbered rows (copy_row).
     run("Input/Output...", "jpeg=75 gif=-1 file=.txt use copy_row");
 
-    //// Define some variables.
-
     // Read window title to get the image name.
     title = getTitle();
+
     // Parsing title to purge extension.
     name = getFilename(title);
+
     // Get image folder.
     dir = getDirectory("image");
+
     // Define full image path without extension.
     namePath = dir + name;
-    // Build path to data file.
+
+    //XXX Make WormBox_Analyzer.py read ROI ZIP directly, instead of TXT.
     filePath = namePath + "_data.txt";
-    //XXX Instead of saving a TXT, make WormBox_Analyzer.py read ROI ZIP 
-    //directly.
 
-    //// Begin.
-
+    // If it is a regular saving, ask user to count (meristic=true).
     if (meristic == true) {
         counting = getBoolean("Do you want to count structures?");
         if (counting == true) {
@@ -201,35 +221,21 @@ function saveWorm(meristic) {
 
     // Deselect items on the list.
     roiManager("Deselect");
+
     // Save ROI for the image.
     roiManager("Save", namePath + ".zip");
-    //XXX Ask user to save as default template?
 
     // Calculate measurements.
     roiManager("Measure");
+
     // Focus Results window
     selectWindow("Results");
+
     // Finally save measurements.
     saveAs("measurements", filePath);
+
     // Disable ROI Manager points.
     roiManager("Show None");
-
-    // [DEPRECATED] Save landmarks to file (must be TIFF).
-    // Never save landmarks to file, save them as ROI instead
-    // to keep names (saving to file will make them sequential).
-    //n = roiManager("count");
-    //xs = newArray(n);
-    //ys = newArray(n);
-    //getPixelSize(unit, pw, ph, pd);
-    //// Build arrays with coordinates.
-    //for (i=0; i<n; i++) {
-    //    x_value = getResult("X", i);
-    //    xs[i] = x_value / pw;
-    //    y_value = getResult("Y", i);
-    //    ys[i] = y_value / pw;
-    //}
-    //// Create selection.
-    //makeSelection("point", xs, ys);
 
     // Close windows.
     selectWindow("Results");
@@ -237,9 +243,9 @@ function saveWorm(meristic) {
     selectWindow("ROI Manager");
     run("Close");
 
-    // Save image as TIFF.
+    // Select opened window to save.
     selectWindow(title);
-    //XXX Makes lowercase TIF > tif. Ideally it should preserve the extension.
+    // Save image as TIFF (makes TIF >> tif).
+    //XXX Ideally it should preserve the extension.
     saveAs("tiff", namePath);
 }
-

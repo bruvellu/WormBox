@@ -40,6 +40,7 @@ function isScaled(title) {
     getPixelSize(unit, pixelWidth, pixelHeight, pixelDepth);
     //TODO Check if unit is set and force user to update.
     if (pixelWidth == 1 || pixelWidth == 1 || unit == "pixels" || unit == "" || unit == " ") {
+        setTool("line");
         waitForUser("Critical issue!", "It looks like " + title + " scale \nis not set or the unit name is missing:\n \nPixel width: " + pixelWidth + "\nPixel height: " + pixelHeight + "\nPixel depth: " + pixelDepth + "\nUnit: " + unit + "\n \nWith this window open, set the scale using \nAnalyse > Set Scale... and then hit OK to continue.");
         getPixelSize(unit, pixelWidth, pixelHeight, pixelDepth);
         if (pixelWidth == 1 || pixelWidth == 1 || unit == "pixels" || unit == "" || unit == " ") {

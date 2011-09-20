@@ -320,10 +320,14 @@ def write_results(output):
     ordered_data = [[value for value in data[k] if value != 'NA'] for k in labels]
     n_samples, means, std_devs = [], [], []
     for values in ordered_data:
-        # Define values.
-        n = len(values)
-        mean = sum(values) / float(n)
-        sd = get_sd(values)
+        if values:
+            # Define values.
+            n = len(values)
+            mean = sum(values) / float(n)
+            sd = get_sd(values)
+        else:
+            # Empty values, replace by NAs.
+            n, mean, sd = 'NA', 'NA', 'NA'
         # Append to lists.
         n_samples.append(str(n))
         means.append(str(mean))

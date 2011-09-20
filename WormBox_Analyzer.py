@@ -5,7 +5,7 @@ from ij.gui import GenericDialog
 from ij.io import OpenDialog
 from math import sqrt
 
-## CLASSES ##
+### CLASSES ###
 
 
 class Aspect:
@@ -103,8 +103,6 @@ class Image:
         return names
 
 
-lm = { '1x0.2y0.4': { 'id': '1x0.2y0.4', 'name': '1', 'x': '0.2', 'y': '0.4' }, '2x0.1y0.5': { 'id': '2x0.1y0.5', 'name': '2', 'x': '0.1', 'y': '0.5', } }
-
 class Landmark:
     '''A landmark data point.'''
     def __init__(self, name, x, y):
@@ -117,7 +115,7 @@ class Landmark:
         return '%s(%f, %f)' % (self.name, self.x, self.y)
 
 
-## FUNCTIONS ##
+### FUNCTIONS ###
 
 def import_datafiles(folder):
     '''Import files with raw landmark data from folder.

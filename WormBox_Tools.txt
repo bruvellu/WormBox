@@ -10,21 +10,21 @@ macro "Load ROI for image [1]" {
 }
 
 macro "Save image data Action Tool - C622 T0808s T5808a Ta808v Tc808e P2c3e4d5c6f7d8e9caebdcfddecff0" {
-    saveWorm(true);
+    saveWorm();
 }
 macro "Save image data [2]" {
-    saveWorm(true);
+    saveWorm();
 }
 
 macro "Count structure Action Tool - C222 T0807c T4807o T7807u Tb807n Tf807t P2c3e4d5c6f7d8e9caebdcfddecff0" {
     loadWorm();
     count();
-    saveWorm(false);
+    saveWorm();
 }
 macro "Count structure data [3]" {
     loadWorm();
     count();
-    saveWorm(false);
+    saveWorm();
 }
 
 //TODO Write return values for all functions.
@@ -64,7 +64,6 @@ function isScaled(title) {
      */
     selectImage(title);
     getPixelSize(unit, pixelWidth, pixelHeight, pixelDepth);
-    //TODO Check if unit is set and force user to update.
     if (pixelWidth == 1 || pixelWidth == 1 || unit == "pixels" || unit == "" || unit == " ") {
         setTool("line");
         waitForUser("Critical issue!", "It looks like " + title + " scale \nis not set or the unit name is missing:\n \nPixel width: " + pixelWidth + "\nPixel height: " + pixelHeight + "\nPixel depth: " + pixelDepth + "\nUnit: " + unit + "\n \nWith this window open, set the scale using \nAnalyse > Set Scale... and then hit OK to continue.");
@@ -182,7 +181,7 @@ function loadWorm() {
     }
 }
 
-function saveWorm(meristic) {
+function saveWorm() {
     /*
      * Save landmarks to ROI and to a text file for posterior analysis.
      *
@@ -211,13 +210,13 @@ function saveWorm(meristic) {
     //XXX Make WormBox_Analyzer.py read ROI ZIP directly, instead of TXT.
     filePath = namePath + "_data.txt";
 
-    // If it is a regular saving, ask user to count (meristic=true).
-    if (meristic == true) {
-        counting = getBoolean("Do you want to count structures?");
-        if (counting == true) {
-            count();
-        }
-    }
+    //// If it is a regular saving, ask user to count (meristic=true).
+    //if (meristic == true) {
+    //    counting = getBoolean("Do you want to count structures?");
+    //    if (counting == true) {
+    //        count();
+    //    }
+    //}
 
     // Deselect items on the list.
     roiManager("Deselect");

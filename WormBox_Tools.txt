@@ -10,10 +10,21 @@ macro "Load ROI for image [1]" {
 }
 
 macro "Save image data Action Tool - C622 T0808s T5808a Ta808v Tc808e P2c3e4d5c6f7d8e9caebdcfddecff0" {
-    saveWorm();
+    saveWorm(true);
 }
 macro "Save image data [2]" {
-    saveWorm();
+    saveWorm(true);
+}
+
+macro "Count structure Action Tool - C222 T0807c T4807o T7807u Tb807n Tf807t P2c3e4d5c6f7d8e9caebdcfddecff0" {
+    loadWorm();
+    count();
+    saveWorm(false);
+}
+macro "Count structure data [3]" {
+    loadWorm();
+    count();
+    saveWorm(false);
 }
 
 function getFilename(title) {
@@ -47,6 +58,14 @@ function isScaled(title) {
             exit("Scale was not set. Impossible to continue... \nSet the scale before running WormBox again. Bye!");
         }
     }
+}
+
+function count() {
+    run("Select None");
+    setTool("multipoint");
+    waitForUser("Click on the image to count and press OK");
+    setKeyDown("alt");
+    roiManager("Add");
 }
 
 function getHeightUnit() {
@@ -140,7 +159,7 @@ function loadWorm() {
     }
 }
 
-function saveWorm() {
+function saveWorm(meristic) {
     // Save landmarks to ROI and to a text file for posterior analysis.
 
     //Prepare.
@@ -161,19 +180,16 @@ function saveWorm() {
     namePath = dir + name;
     // Build path to data file.
     filePath = namePath + "_data.txt";
-    //XXX Instead of saving a TXT, why not use the ROI ZIP directly at the 
-    //WormBox_.py plugin?
+    //XXX Instead of saving a TXT, make WormBox_Analyzer.py read ROI ZIP 
+    //directly.
 
     //// Begin.
 
-    //TODO Ask here if user wants to count something!!!
-    counting = getBoolean("Do you want to count structures?");
-    if (counting == true) {
-        run("Select None");
-        setTool("multipoint");
-        waitForUser("Click on the image to count and press OK");
-        setKeyDown("alt");
-        roiManager("Add");
+    if (meristic == true) {
+        counting = getBoolean("Do you want to count structures?");
+        if (counting == true) {
+            count();
+        }
     }
 
     // Deselect items on the list.

@@ -28,9 +28,16 @@ macro "Count structure data [3]" {
 }
 
 function getFilename(title) {
-    // Parse window title to get filename without extension.
-    //XXX Issue warning if filename has more than 2 "."?
+    /*
+     * Parse window title to get filename without extension.
+     *
+     * Exit if filename has extra dots in it.
+     */
     temp = split(title, ".");
+    listSize = temp.length;
+    if ( listSize > 2 ) {
+        exit("Filename should not have \".\" characters (except preceding the extension):\n \n" + title + "\n \nPlease rename the file and try to load WormBox again.");
+    }
     name = temp[0];
     return name;
 }

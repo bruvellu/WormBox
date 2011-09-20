@@ -5,6 +5,8 @@ from ij.gui import GenericDialog
 from ij.io import OpenDialog
 from math import sqrt
 
+# Fiji only (or ImageJ+Jython).
+
 ### CLASSES ###
 
 
@@ -312,7 +314,11 @@ def write_results(output):
                 data[name].append(value)
             output.write(',' + str(value))
         output.write('\n')
+        print
+        print image_data
+        print
 
+    print data
     # Sort data according to aspect names list and use a bundled list 
     # comprehension to exclude NA values.
     ordered_data = [[value for value in data[k] if value != 'NA'] for k in labels]

@@ -122,6 +122,13 @@ function loadWorm() {
     // Necessary to load ROI Manager with Edit Mode activated.
     requires("1.45m");
 
+    // If ROI Manager is open, close it to avoid landmark duplication.
+    roiOpen = isOpen("ROI Manager");
+    if ( roiOpen == 1 ) {
+        selectWindow("ROI Manager");
+        run("Close");
+    };
+
     // Read window title to get the image name.
     title = getTitle();
 
@@ -201,6 +208,8 @@ function saveWorm() {
      * Argument "meristic" can be "true" to prompt user to count structures or 
      * "false" to skip this prompt.
      */
+
+    //XXX ROI Manager from LOAD still needs to be open!
 
     // Set decimal to 3.
     run("Set Measurements...", "display redirect=None decimal=3");

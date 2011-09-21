@@ -16,14 +16,10 @@ macro "Save image data [2]" {
 }
 
 macro "Count a structure Action Tool - CfffD00D01D02D03D04D05D06D07D08D09D0aD0bD0cD0dD0eD0fD10D11D12D13D14D15D16D17D18D19D1aD1bD1cD1dD1eD1fD20D21D22D23D24D25D26D27D28D29D2aD2bD2cD2dD2eD2fD30D31D33D34D35D36D37D38D39D3aD3dD3eD3fD40D41D45D46D47D48D49D4dD4eD4fD50D51D56D57D5dD5eD5fD60D61D6dD6eD6fD70D71D7aD7dD7eD7fD80D81D84D88D89D8aD8dD8eD8fD90D91D94D95D96D97D98D99D9dD9eD9fDa0Da1Da4Da5Da6Da7Da8Da9DaaDadDaeDafDb0Db1Db5Db6Db7Db8DbdDbeDbfDc0Dc1Dc2Dc3Dc4Dc5Dc6Dc7Dc8Dc9DcaDcbDccDcdDceDcfDd0Dd1Dd2Dd3Dd4Dd5Dd6Dd7Dd8Dd9DdaDdbDdcDddDdeDdfDe0De1De2De3De4De5De6De7De8De9DeaDebDecDedDeeDefDf0Df1Df2Df3Df4Df5Df6Df7Df8Df9DfaDfbDfcDfdDfeDffCaaaD58D67D85Da3Db3C999D3cD4bD5aD5bD69D6aD79CbbbD32D42D43D52D62C888D6cD7bD8bD9aCbbbD44D55D63D72D73D82D92C999D3bD4aD59D68D77D78D86D87Db4CcccD54D64C777D7cD8cD9bDb9CaaaD66D74D75D83D93Da2Db2C888D4cD5cD6bCcccD65D76C777D9cDabDacDbaDbbCeeeD53" {
-    loadWorm();
-    count();
-    saveWorm();
+    countWorm();
 }
 macro "Count a structure data [3]" {
-    loadWorm();
-    count();
-    saveWorm();
+    countWorm();
 }
 
 macro "Add extra landmarks Action Tool - CadaD36D93C7a6D18CfffD00D01D02D03D04D05D06D07D08D09D0aD0bD0cD0dD0eD0fD10D11D12D13D1cD1dD1eD1fD20D21D22D2dD2eD2fD30D31D3eD3fD40D4fD50D57D58D5fD60D67D68D6fD70D75D76D77D78D79D7aD7fD80D85D86D87D88D89D8aD8fD90D97D98D9fDa0Da7Da8DafDb0DbfDc0Dc1DceDcfDd0Dd1Dd2DddDdeDdfDe0De1De2De3DecDedDeeDefDf0Df1Df2Df3Df4Df5Df6Df7Df8Df9DfaDfbDfcDfdDfeDffC6a5D2bDc2CbdaD43D92C8c7D6dDb3C483D5eCbdaD26D28D34D3aD4bD5cDc5C7c6D59C7b5DabDbaCcecDa3C9c8D6cD9cC383D8eDe9CbdaDacDbbDcaC7b6D3bD66Da2Dc4C7a5D1aCbebD27D63C8c8D46D74C594Dd4C8b7D9dDd9C7b6D5bD6aDa6CdedD35Cad9D7dC382D9eDaeDbdDccDdbDeaC7b6D7cD8cDc8C6a5D96Db1DbcDcbCbeaDb4C8c7D38D65C594D4dDe4C8b7D14D23D32D41D51C7b5D5aD6bD7bD99D9aDa9Db6Db7Db8Db9CcecD82C9d8Dc6C483D6eDdaDe6De7C8b7D15D24D33D42C7a6D19D91Da1CcecD62C9d8D37D39D55D84D94C595Dc3C8c7D48CdfdD44Cad9Dd7Dd8C7b6D17C6a5D2aC8c7D47D56D95C494D4eDe5C7c6D49Da5Db5Dc7C9c8D29C383De8C6b5D8bD9bDaaC9c8Dc9C594D3cD3dDd3Cad9D45D83C9c8D25Dd6C594D5dDd5CdecD72Cac9D52D8dC695D2cCefdD53Cad9D73C7b6D4cD81C6a5D69C7c6D4aC9d9D54C8b6D16D61D71C6a5D1bDb2C483D7eDadC8d8Da4C9c8D64" {
@@ -87,15 +83,29 @@ function isScaled(title) {
     }
 }
 
-function count() {
+function countWorm() {
     /*
      * Workflow to count structures in the images.
      */
+
+    // If ROI Manager is open, user possibly forgot to save. So, save.
+    roiOpen = isOpen("ROI Manager");
+    if ( roiOpen == 1 ) {
+        saveWorm();
+    }
+
+    // Load landmarks.
+    loadWorm();
+
+    // Set the interface to count structures.
     run("Select None");
     setTool("multipoint");
     waitForUser("Without closing this window:\n \n1. Count the number of structures by clicking on the image.\n \n2. When finished, press OK and give a name for this structure.");
     setKeyDown("alt");
     roiManager("Add");
+
+    // Save new landmarks.
+    saveWorm();
 }
 
 function getHeightUnit() {
@@ -127,7 +137,7 @@ function loadWorm() {
     if ( roiOpen == 1 ) {
         selectWindow("ROI Manager");
         run("Close");
-    };
+    }
 
     // Read window title to get the image name.
     title = getTitle();
@@ -231,14 +241,6 @@ function saveWorm() {
 
     //XXX Make WormBox_Analyzer.py read ROI ZIP directly, instead of TXT.
     filePath = namePath + "_data.txt";
-
-    //// If it is a regular saving, ask user to count (meristic=true).
-    //if (meristic == true) {
-    //    counting = getBoolean("Do you want to count structures?");
-    //    if (counting == true) {
-    //        count();
-    //    }
-    //}
 
     // Deselect items on the list.
     roiManager("Deselect");

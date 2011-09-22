@@ -1,9 +1,11 @@
 import os
+import re
 import sys
 from ij import IJ
 from ij.gui import GenericDialog
 from ij.io import OpenDialog
 from math import sqrt
+from string import Template
 
 # Fiji only (or ImageJ+Jython).
 
@@ -20,8 +22,10 @@ class Aspect:
         self.name = name
         self.landmarks_names = []
         self.landmarks = []
+        self.equation = ''
         self.value = None
         self.meristic = False
+        self.math = False
 
     def connect_landmarks(self, image):
         '''Connect selected landmarks from an image to aspect.'''
@@ -36,6 +40,39 @@ class Aspect:
     def add_landmark(self, landmark):
         '''Attach a landmark object to aspect.'''
         self.landmarks.append(landmark)
+
+    def get_equation_variables(self, string):
+        '''Parse a math equation from config.'''
+        #variables = [var.strip('}/*+-% ') for var in string.split('{')[1:]]
+        variables = re.findall(r'{(.*?)}', string)
+        if variables:
+            return variables
+        return None
+
+    def check_math(self, image):
+        '''Check if an aspect is a math aspect.'''
+        if len(self.landmarks_names) == 1:
+            raw = self.landmarks_names[0]
+            variables = self.get_equation_variables(raw)
+            if variables:
+                values = self.get_aspect_values(image.aspects, variables)
+                template = Template(raw)
+                self.equation = template.substitute(**values)
+                self.math = True
+                return self.math
+        return self.math
+
+    def get_aspect_values(self, aspects, variables):
+        '''Get values from image aspects.'''
+        values = {}
+        for var in variables:
+            #XXX Do not use with pseudoreplicates! Must be unique names.
+            for k, aspect in aspects.iteritems():
+                if var == aspect.name:
+                    selected = aspect
+            values[var] = selected.value
+            self.add_landmark(selected)
+        return values
 
     def get_distance(self, lm_1, lm_2):
         '''Calculate distance between 2 landmarks.'''
@@ -53,6 +90,12 @@ class Aspect:
             # Passed the test.
             if self.meristic:
                 self.value = len(self.landmarks)
+            elif self.math:
+                # Try in case there is a NA variable.
+                try:
+                    self.value = eval(self.equation)
+                except:
+                    self.value = 'NA'
             else:
                 distances = []
                 n = len(self.landmarks)
@@ -70,6 +113,8 @@ class Aspect:
     def check(self):
         '''Check if landmarks are missing.'''
         if self.meristic:
+            return True
+        elif self.math:
             return True
         else:
             expected = len(self.landmarks_names)
@@ -217,6 +262,7 @@ def parse_config(images):
                 # Create individual Aspect instance.
                 aspect = Aspect(aspect_id, aspect_name)
                 aspect.landmarks_names = aspect_landmarks_names
+                aspect.check_math(image)
                 aspect.connect_landmarks(image)
                 aspect.calculate()
                 image.add_aspect(aspect)
@@ -314,11 +360,7 @@ def write_results(output):
                 data[name].append(value)
             output.write(',' + str(value))
         output.write('\n')
-        print
-        print image_data
-        print
 
-    print data
     # Sort data according to aspect names list and use a bundled list 
     # comprehension to exclude NA values.
     ordered_data = [[value for value in data[k] if value != 'NA'] for k in labels]

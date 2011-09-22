@@ -23,8 +23,10 @@ macro "Count a structure data [3]" {
 }
 
 macro "Add extra landmarks Action Tool - CadaD36D93C7a6D18CfffD00D01D02D03D04D05D06D07D08D09D0aD0bD0cD0dD0eD0fD10D11D12D13D1cD1dD1eD1fD20D21D22D2dD2eD2fD30D31D3eD3fD40D4fD50D57D58D5fD60D67D68D6fD70D75D76D77D78D79D7aD7fD80D85D86D87D88D89D8aD8fD90D97D98D9fDa0Da7Da8DafDb0DbfDc0Dc1DceDcfDd0Dd1Dd2DddDdeDdfDe0De1De2De3DecDedDeeDefDf0Df1Df2Df3Df4Df5Df6Df7Df8Df9DfaDfbDfcDfdDfeDffC6a5D2bDc2CbdaD43D92C8c7D6dDb3C483D5eCbdaD26D28D34D3aD4bD5cDc5C7c6D59C7b5DabDbaCcecDa3C9c8D6cD9cC383D8eDe9CbdaDacDbbDcaC7b6D3bD66Da2Dc4C7a5D1aCbebD27D63C8c8D46D74C594Dd4C8b7D9dDd9C7b6D5bD6aDa6CdedD35Cad9D7dC382D9eDaeDbdDccDdbDeaC7b6D7cD8cDc8C6a5D96Db1DbcDcbCbeaDb4C8c7D38D65C594D4dDe4C8b7D14D23D32D41D51C7b5D5aD6bD7bD99D9aDa9Db6Db7Db8Db9CcecD82C9d8Dc6C483D6eDdaDe6De7C8b7D15D24D33D42C7a6D19D91Da1CcecD62C9d8D37D39D55D84D94C595Dc3C8c7D48CdfdD44Cad9Dd7Dd8C7b6D17C6a5D2aC8c7D47D56D95C494D4eDe5C7c6D49Da5Db5Dc7C9c8D29C383De8C6b5D8bD9bDaaC9c8Dc9C594D3cD3dDd3Cad9D45D83C9c8D25Dd6C594D5dDd5CdecD72Cac9D52D8dC695D2cCefdD53Cad9D73C7b6D4cD81C6a5D69C7c6D4aC9d9D54C8b6D16D61D71C6a5D1bDb2C483D7eDadC8d8Da4C9c8D64" {
+    addExtra();
 }
-macro "Add extra landmarks [5]" {
+macro "Add extra landmarks [4]" {
+    addExtra();
 }
 
 // Fiji only (or ImageJ+Jython).
@@ -209,6 +211,65 @@ function loadWorm() {
             roiManager("Save", roiTemplatePath);
         }
     }
+}
+
+function addExtra() {
+    // Load landmarks.
+    loadWorm();
+
+    r = roiManager("count");
+
+    // Set the interface to count structures.
+    run("Select None");
+    //setTool("point");
+
+    width = getWidth();
+    height = getHeight();
+    makePoint(width/2, height/2);
+
+    // Add extra landmark.
+    setKeyDown("alt");
+    roiManager("Add");
+
+    run("Select None");
+
+    saveWorm();
+
+    //// Call default template builder.
+    //Dialog.create("Add extra landmarks");
+    //Dialog.addNumber("Number of landmarks", 10);
+    //Dialog.show();
+    //// Get number of landmarks from the user.
+    //n = Dialog.getNumber();
+
+    //// Get landmarks.
+    //r = roiManager("count");
+    //a = newArray(r);
+
+    //y = 0
+    //for (i=0; i<r; i++) {
+    //    a[i] = call("ij.plugin.frame.RoiManager.getName", i);
+    //    for (z=0; z<n; z++) {
+    //        if ( z == a[i] ) {
+    //            y = a[i]
+    //        }
+    //    }
+    //}
+    //print(y);
+
+    //// Get image dimensions to calculate unit.
+    //width = getWidth();
+    //wUnit = width / n;
+    //hUnit = getHeightUnit();
+    ////XXX Small image dimensions might overflow landmarks.
+    //for (i=1; i<n; i++) {
+    //    makePoint(wUnit, hUnit*(i));
+    //    roiManager("Add");
+    //    roiManager("Select", i+r);
+    //    roiManager("Rename", i+r);
+    //}
+    //roiManager("Deselect");
+    //roiManager("Save", roiTemplatePath);
 }
 
 function saveWorm() {

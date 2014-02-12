@@ -199,11 +199,11 @@ function loadWorm() {
             n = Dialog.getNumber();
             // Get image dimensions to calculate unit.
             width = getWidth();
-            wUnit = width / n;
+            wUnit = width / 2;
             hUnit = getHeightUnit();
             //XXX Small image dimensions might overflow landmarks.
             for (i=0; i<n; i++) {
-                makePoint(wUnit, hUnit*(i+1));
+                makePoint(wUnit, (hUnit*i)+10);
                 roiManager("Add");
                 roiManager("Select", i);
                 roiManager("Rename", i+1);

@@ -112,11 +112,12 @@ function countWorm() {
 
 function getHeightUnit() {
     /*
-     * Fill default landmarks within the image dimensions.
+     * Fill default landmarks within the image dimensions. Subtracts 20 pixels
+     * to avoid borders.
      */
     height = getHeight();
-    hUnit = height / n;
-    return hUnit - hUnit/2;
+    hUnit = (height-20)/n;
+    return hUnit;
 }
 
 function loadWorm() {
@@ -217,59 +218,32 @@ function addExtra() {
     // Load landmarks.
     loadWorm();
 
+    // Unload any selection.
+    run("Select None");
+
+    // Call default template builder.
+    Dialog.create("Add extra landmarks");
+    Dialog.addNumber("Number of landmarks", 10);
+    Dialog.show();
+    // Get number of landmarks from the user.
+    n = Dialog.getNumber();
+
+    // Get landmark count.
     r = roiManager("count");
 
-    // Set the interface to count structures.
-    run("Select None");
-    //setTool("point");
-
+    // Get image dimensions to calculate unit.
     width = getWidth();
-    height = getHeight();
-    makePoint(width/2, height/2);
-
-    // Add extra landmark.
-    setKeyDown("alt");
-    roiManager("Add");
-
-    run("Select None");
-
-    saveWorm();
-
-    //// Call default template builder.
-    //Dialog.create("Add extra landmarks");
-    //Dialog.addNumber("Number of landmarks", 10);
-    //Dialog.show();
-    //// Get number of landmarks from the user.
-    //n = Dialog.getNumber();
-
-    //// Get landmarks.
-    //r = roiManager("count");
-    //a = newArray(r);
-
-    //y = 0
-    //for (i=0; i<r; i++) {
-    //    a[i] = call("ij.plugin.frame.RoiManager.getName", i);
-    //    for (z=0; z<n; z++) {
-    //        if ( z == a[i] ) {
-    //            y = a[i]
-    //        }
-    //    }
-    //}
-    //print(y);
-
-    //// Get image dimensions to calculate unit.
-    //width = getWidth();
-    //wUnit = width / n;
-    //hUnit = getHeightUnit();
-    ////XXX Small image dimensions might overflow landmarks.
-    //for (i=1; i<n; i++) {
-    //    makePoint(wUnit, hUnit*(i));
-    //    roiManager("Add");
-    //    roiManager("Select", i+r);
-    //    roiManager("Rename", i+r);
-    //}
-    //roiManager("Deselect");
-    //roiManager("Save", roiTemplatePath);
+    // Always put new landmarks in the center.
+    wUnit = width / 2;
+    hUnit = getHeightUnit();
+    //XXX Small image dimensions might overflow landmarks.
+    for (i=0; i<n; i++) {
+        makePoint(wUnit, (hUnit*i)+10);
+        roiManager("Add");
+        roiManager("Select", i+r);
+        roiManager("Rename", i+r+1);
+    }
+    roiManager("Deselect");
 }
 
 function saveWorm() {
@@ -333,3 +307,9 @@ function saveWorm() {
     //XXX Ideally it should preserve the extension.
     saveAs("tiff", namePath);
 }
+
+/*
+ *  TODO:
+ *  - Merge add landmark code into a single callable function.
+ *  - Expose paths whenever calling loadWorm.
+ */

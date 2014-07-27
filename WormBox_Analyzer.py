@@ -1,10 +1,9 @@
 import os
 import re
-import sys
 from ij import IJ
 from ij.gui import GenericDialog
 from ij.io import OpenDialog
-from math import sqrt
+from math import sqrt, floor, ceil
 from string import Template
 
 # Fiji only (or ImageJ+Jython).
@@ -81,7 +80,7 @@ class Aspect:
     def calculate(self):
         '''Calculate the final value of the aspect.
 
-        Run a check to see if any landmarks are missing. If yes, change values 
+        Run a check to see if any landmarks are missing. If yes, change values
         to NA.
 
         self.landmarks = [landmark, landmark, (...)]
@@ -128,7 +127,7 @@ class Aspect:
 class Image:
     '''Defines an image file and store landmarks and aspects.
 
-    Landmark and Aspect objects are stored in dictionaries where the keys are 
+    Landmark and Aspect objects are stored in dictionaries where the keys are
     their names and unique ids, respectively.
     '''
     def __init__(self, filename):
@@ -181,7 +180,7 @@ def import_datafiles(folder):
 def parse_data(datafiles):
     '''Parse data from raw files.
 
-    Read each line and instantiate objects to store data. Returns a dictionary 
+    Read each line and instantiate objects to store data. Returns a dictionary
     of Image instances associated with correspondent landmarks.
 
     Format:
@@ -275,7 +274,7 @@ def parse_config(images):
 
 def parse_config_line(line):
     '''Parse a single line of the config file and return values.'''
-    #TODO Error handling in general, parsing may fail, config file 
+    #TODO Error handling in general, parsing may fail, config file
     # might not be in the appropriate format!
     # Strip newlines.
     this_line = line.strip('\n')
@@ -361,40 +360,106 @@ def write_results(output):
             output.write(',' + str(value))
         output.write('\n')
 
-    # Sort data according to aspect names list and use a bundled list 
+    # Sort data according to aspect names list and use a bundled list
     # comprehension to exclude NA values.
     ordered_data = [[value for value in data[k] if value != 'NA'] for k in labels]
     n_samples, means, std_devs = [], [], []
+    minimums, first_quartiles, medians, third_quartiles, maximums = [], [], [], [], []
     for values in ordered_data:
         if values:
-            # Define values.
-            n = len(values)
-            mean = sum(values) / float(n)
-            sd = get_sd(values)
+            # Calculate descriptive statistics.
+            stats = get_stats(values)
+
+            # Save values in new objects.
+            n = stats['n']
+            mean = stats['mean']
+            standard_deviation = stats['std']
+            minimum = stats['min']
+            first_quartile = stats['25']
+            median = stats['median']
+            third_quartile = stats['75']
+            maximum = stats['max']
         else:
             # Empty values, replace by NAs.
-            n, mean, sd = 'NA', 'NA', 'NA'
+            n, mean, standard_deviation = 'NA', 'NA', 'NA'
+            minimum, first_quartile, median, third_quartile, maximum = 'NA', 'NA', 'NA', 'NA', 'NA'
+
         # Append to lists.
         n_samples.append(str(n))
         means.append(str(mean))
-        std_devs.append(str(sd))
+        std_devs.append(str(standard_deviation))
+        minimums.append(str(minimum))
+        first_quartiles.append(str(first_quartile))
+        medians.append(str(median))
+        third_quartiles.append(str(third_quartile))
+        maximums.append(str(maximum))
 
+    # Write n samples.
+    output.write('n,%s\n' % ','.join(n_samples))
     # Write means.
     output.write('mean,%s\n' % ','.join(means))
     # Write standard deviations.
-    output.write('sd,%s\n' % ','.join(std_devs))
-    # Write n samples.
-    output.write('n,%s\n' % ','.join(n_samples))
+    output.write('std,%s\n' % ','.join(std_devs))
+    # Write minimums.
+    output.write('min,%s\n' % ','.join(minimums))
+    # Write first quartiles.
+    output.write('1st_q,%s\n' % ','.join(first_quartiles))
+    # Write medians.
+    output.write('median,%s\n' % ','.join(medians))
+    # Write third_quartiles.
+    output.write('3rd_q,%s\n' % ','.join(third_quartiles))
+    # Write maximums.
+    output.write('max,%s\n' % ','.join(maximums))
 
-def get_sd(distances):
-    '''Calculate standard deviation between distances.'''
-    n = len(distances)
-    mean = sum(distances) / float(n)
+def get_stats(values):
+    '''Calculate descriptive statistics for measurements.'''
+    # Sort list of values in place. Needed for five number summary,
+    values.sort()
+
+    # Store values in single dictionary.
+    stats = {}
+
+    # Number of samples.
+    n = stats['n'] = len(values)
+
+    # Average of values.
+    mean = stats['mean'] = sum(values) / float(n)
+
+    # Standard deviation.
     sums = []
-    for distance in distances:
-        sums.append((distance - mean)**2)
-    sd = sqrt(sum(sums) / n)
-    return sd
+    for value in values:
+        sums.append((value - mean) ** 2)
+    stats['std'] = sqrt(sum(sums) / n)
+
+    # Tukey's five number summary.
+    # Adapted from: https://svn.r-project.org/R/trunk/src/library/stats/R/fivenum.R
+
+    # Calculate a quartile.
+    n4 = floor((n + 3) / 2.0) / 2.0
+
+    # Define base numbers for stats.
+    d = [1.0, n4, (n + 1) / 2.0, n + 1 - n4, float(n)]
+
+    # Indices for floor and ceiling. Have to subtract 1 because of python.
+    floor_idx = [int(floor(q))-1 for q in d]
+    ceil_idx = [int(ceil(q))-1 for q in d]
+
+    # Actual values from each index list.
+    floor_values = [values[idx] for idx in floor_idx]
+    ceil_values = [values[idx] for idx in ceil_idx]
+
+    # Sum correspondents elements of each list.
+    summed_lists = map(sum, zip(floor_values, ceil_values))
+    fivenum = [0.5 * e for e in summed_lists]
+
+    # Map results to stats objects.
+    stats['min'] = fivenum[0]
+    stats['25'] = fivenum[1]
+    stats['median'] = fivenum[2]
+    stats['75'] = fivenum[3]
+    stats['max'] = fivenum[4]
+
+    return stats
 
 def get_config_file(folder):
     '''Returns the config file name.'''

@@ -363,7 +363,7 @@ def write_results(output):
     # Sort data according to aspect names list and use a bundled list
     # comprehension to exclude NA values.
     ordered_data = [[value for value in data[k] if value != 'NA'] for k in labels]
-    n_samples, means, std_devs = [], [], []
+    n_samples, means, std_devs, popstd_devs = [], [], [], []
     minimums, first_quartiles, medians, third_quartiles, maximums = [], [], [], [], []
     for values in ordered_data:
         if values:
@@ -374,6 +374,7 @@ def write_results(output):
             n = stats['n']
             mean = stats['mean']
             standard_deviation = stats['std']
+            popstandard_deviation = stats['pop_std']
             minimum = stats['min']
             first_quartile = stats['25']
             median = stats['median']
@@ -381,13 +382,14 @@ def write_results(output):
             maximum = stats['max']
         else:
             # Empty values, replace by NAs.
-            n, mean, standard_deviation = 'NA', 'NA', 'NA'
+            n, mean, standard_deviation, popstandard_deviation = 'NA', 'NA', 'NA', 'NA'
             minimum, first_quartile, median, third_quartile, maximum = 'NA', 'NA', 'NA', 'NA', 'NA'
 
         # Append to lists.
         n_samples.append(str(n))
         means.append(str(mean))
         std_devs.append(str(standard_deviation))
+        popstd_devs.append(str(popstandard_deviation))
         minimums.append(str(minimum))
         first_quartiles.append(str(first_quartile))
         medians.append(str(median))
@@ -400,6 +402,8 @@ def write_results(output):
     output.write('mean,%s\n' % ','.join(means))
     # Write standard deviations.
     output.write('std,%s\n' % ','.join(std_devs))
+    # Write population standard deviations.
+    output.write('pop_std,%s\n' % ','.join(popstd_devs))
     # Write minimums.
     output.write('min,%s\n' % ','.join(minimums))
     # Write first quartiles.
@@ -429,7 +433,8 @@ def get_stats(values):
     sums = []
     for value in values:
         sums.append((value - mean) ** 2)
-    stats['std'] = sqrt(sum(sums) / n)
+    stats['std'] = sqrt(sum(sums) / float(n))
+    stats['pop_std'] = sqrt(sum(sums) / ((float(n) - 1.0) / float(n)))
 
     # Tukey's five number summary.
     # Adapted from: https://svn.r-project.org/R/trunk/src/library/stats/R/fivenum.R

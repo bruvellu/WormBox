@@ -13,4 +13,4 @@ Simply copy the files to the following folders inside your Fiji directory:
 
 # Usage
 
-For a complete guide download this [tutorial](wormbox_tutorial.pdf).
+For the latest and most-complete usage guide, please visit this [tutorial](http://lhe.ib.usp.br/techniques/doku.php?id=analyses#wormbox_v_10).

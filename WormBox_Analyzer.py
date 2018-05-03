@@ -276,6 +276,7 @@ def parse_config_line(line):
     '''Parse a single line of the config file and return values.'''
     #TODO Error handling in general, parsing may fail, config file
     # might not be in the appropriate format!
+
     # Strip newlines.
     this_line = line.strip('\n')
     # Split at the aspect name.
@@ -287,9 +288,9 @@ def parse_config_line(line):
     # Split landmarks and strip whitespace.
     landmarks_names = [lm.strip(' ') for lm in split_line[1].split(',')]
     # Define Aspect id (eg "name:lm1,lm2").
-    id = name + ':' + ','.join(landmarks_names)
+    aspect_id = name + ':' + ','.join(landmarks_names)
 
-    return id, name, landmarks_names
+    return aspect_id, name, landmarks_names
 
 def get_results_filename():
     '''Prompt the user to suggest name of the output file.'''
@@ -506,7 +507,7 @@ if config_filename:
     config_filepath = os.path.join(folder, config_filename)
     # Load the config file or abort.
     try:
-        config = open(config_filepath)
+        config = open(config_filepath, 'rU')
     except:
         IJ.error('Could not open config file %s' % config_filepath)
         config = None

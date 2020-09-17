@@ -187,14 +187,20 @@ def parse_data(datafiles):
         filename:landmark_name\tx_coordinate\ty_coordinate
 
     Example:
+        Label   X   Y
         Parcel01a-DSCN8755.tif:1	1.610	4.777
         Parcel01a-DSCN8755.tif:2	1.077	2.300
         Parcel01a-DSCN8755.tif:3	2.807	0.730
     '''
+    # Empty dictionary with images.
     images = {}
+    # Iterate over files.
     for file in datafiles:
         datafile = open(file)
         for line in datafile.readlines():
+            # Ignore header lines, if present.
+            if not ':' in line:
+                continue
             # Call line parser to extract values.
             filename, landmark_name, landmark_x, landmark_y = parse_data_line(line)
 
@@ -207,7 +213,7 @@ def parse_data(datafiles):
                 # Add image instance to dictionary.
                 images[image.filename] = image
 
-            # Instantiate landmark object.
+            # Create landmark object.
             landmark = Landmark(landmark_name, landmark_x, landmark_y)
             # Attach landmark to image.
             image.add_landmark(landmark)

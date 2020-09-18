@@ -198,9 +198,15 @@ def parse_data(datafiles):
     for file in datafiles:
         datafile = open(file)
         for line in datafile.readlines():
+
             # Ignore header lines, if present.
             if not ':' in line:
                 continue
+
+            # Skip empty lines, if present.
+            if not line.strip():
+                continue
+
             # Call line parser to extract values.
             filename, landmark_name, landmark_x, landmark_y = parse_data_line(line)
 

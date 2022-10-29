@@ -12,8 +12,8 @@ The easiest way to install **WormBox** is to use Fiji’s update sites.
 
 1. Open Fiji and click on `Help` > `Update...` > `Manage update sites`
 2. Click on `Add update site`, a new line will appear at the bottom of the list
-3. Add `https://sites.imagej.net/WormBox/` to the URL field
-4. Add `WormBox` to the Name field
+3. Add `https://sites.imagej.net/WormBox/` to the **URL** field
+4. Add `WormBox` to the **Name** field
 5. Click `Close` to close the list
 6. Click `Apply changes` to install
 7. Restart Fiji

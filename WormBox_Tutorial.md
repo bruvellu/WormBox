@@ -21,118 +21,80 @@ After installing Fiji/ImageJ, you should verify whether there are updates for Fi
 To accomplish that, open the casting menus of Help in the main menu of Fiji/ImageJ and select the options to update both applications (Figure 1).
 
 ![](media/fig_1.jpg)
+
 **Figure 1**. Options of updates in the main menu of Fiji/ImageJ.
 
-**NOTE:** WormBox will not work in ImageJ as distributed because this
-plugin requires Jython. However, you can make ImageJ capable of dealing
-with WormBox by installing Jython in your system ([see
-here](http://marcora.caltech.edu/jython_imagej_howto.htm)). We have not
-tried to do that and advise you to install Fiji/ImageJ, which seems to a
-much easier solution.\
+**NOTE:** WormBox will not work in ImageJ as distributed because this plugin requires Jython.
+However, you can make ImageJ capable of dealing with WormBox by installing Jython in your system ([see here](http://marcora.caltech.edu/jython_imagej_howto.htm)).
+We have not tried to do that and advise you to install Fiji/ImageJ, which seems to a much easier solution.
 
 ## Installing
 
-After downloading WormBox.zip and decompressing the ZIP file, you will
-find two files within the folder: WormBox_Tools.txt and
-WormBox_Analyzer.py. These files are the scripts of WormBox and will
-have to be moved to specific locations within Fiji/ImageJ\'s folders.
-Thus, move WormBox_Tools.txt to Fiji.app/macros/toolsets/ and
-WormBox_Analyzer.py to Fiji.app/plugins/.
+After downloading WormBox.zip and decompressing the ZIP file, you will find two files within the folder: WormBox_Tools.txt and WormBox_Analyzer.py.
+These files are the scripts of WormBox and will have to be moved to specific locations within Fiji/ImageJ\'s folders.
+Thus, move WormBox_Tools.txt to Fiji.app/macros/toolsets/ and WormBox_Analyzer.py to Fiji.app/plugins/.
 
--   **NOTE:** MAC users could use the terminal to accomplish this task.
-    -   Open the Terminal application;
-    -   Move to the folder where WormBox.txt and WormBox\_.py are
-        located (e.g., cd Desktop/WormBox);
-    -   Execute \'cp WormBox.txt
-        /Applications/Fiji.app/macros/toolsets/\';
-    -   Execute \'cp WormBox\_.py /Applications/Fiji.app/plugins/\'.
+**NOTE:** MAC users could use the terminal to accomplish this task.
+
+-   Open the Terminal application;
+-   Move to the folder where WormBox.txt and WormBox\_.py are
+    located (e.g., cd Desktop/WormBox);
+-   Execute \'cp WormBox.txt
+    /Applications/Fiji.app/macros/toolsets/\';
+-   Execute \'cp WormBox\_.py /Applications/Fiji.app/plugins/\'.
 
 ## Planning your project
 
-\
-WormBox uses landmarks to compute linear distances. Thus, before you
-start, you should plan your project so that you have a clear idea of how
-many landmarks you will need to obtain the measurements you want. You
-can add more landmarks throughout the process, but we advise you to
-really make an effort to plan ahead. We will illustrate the basics of
-WormBox by using an example in which our goal is to obtain measurements
-from a set of hooks for *Potamotrygonocestus* (a onchobothriid cestode).
+WormBox uses landmarks to compute linear distances.
+Thus, before you start, you should plan your project so that you have a clear idea of how many landmarks you will need to obtain the measurements you want. 
+You can add more landmarks throughout the process, but we advise you to really make an effort to plan ahead.
+We will illustrate the basics of WormBox by using an example in which our goal is to obtain measurements from a set of hooks for *Potamotrygonocestus* (a onchobothriid cestode).
 With this example we hope to demonstrate how WormBox can be helpful.
 
-![](media/fig_2.jpg){.align-center
-width="300"} `
- <center>
-  <b>Figure 2</b>. Definition of landmarks upon handles and prongs of internal and lateral bothridial hooks of <i>Potamotrygonocestus</i>.
- </center>
-`{=html}\
-You should start by defining the landmarks that would allow you to
-calculate the distances (measurements) you need (Figure 2). In the
-example below, we want to obtain the measurements from handles and
-prongs of the internal and lateral bothridial hooks. Accordingly, we
-defined 8 landmarks (Figure 2). WormBox allows you to set as many as
-landmarks as you need (or wish), but you should always be careful and
-minimize the amount of landmarks for practical reasons.\
+![](media/fig_2.jpg)
+
+**Figure 2**. Definition of landmarks upon handles and prongs of internal and lateral bothridial hooks of *Potamotrygonocestus*.
+
+You should start by defining the landmarks that would allow you to calculate the distances (measurements) you need (Figure 2).
+In the example below, we want to obtain the measurements from handles and prongs of the internal and lateral bothridial hooks.
+Accordingly, we defined 8 landmarks (Figure 2).
+WormBox allows you to set as many as landmarks as you need (or wish), but you should always be careful and minimize the amount of landmarks for practical reasons.
 
 ## Getting started
 
-Once you have a good idea of the measurements you want to take and the
-landmarks required to do that, you should compile within a folder all
-the images you want to extract the measurements. We provide a folder
-called "hooks" that we will use in the first part of this tutorial. The
-images in this folder have the hooks from which to obtain the
-measurements defined in Figure 2. Ultimately, the images should be all
-scaled, preferentially using ImageJ or Fiji/ImageJ. WormBox will inform
-you whether it recognized the scales in your images. If WormBox does not
-recognize the scale, it will ask you to set up the scale. Here are the
-steps you should take to fully complete the first part of this tutorial
-(![PDF](media/wormbox_tutorial.pdf)):
+Once you have a good idea of the measurements you want to take and the landmarks required to do that, you should compile within a folder all the images you want to extract the measurements.
+We provide a folder called "hooks" that we will use in the first part of this tutorial.
+The images in this folder have the hooks from which to obtain the measurements defined in Figure 2.
+Ultimately, the images should be all scaled, preferentially using ImageJ or Fiji/ImageJ.
+WormBox will inform you whether it recognized the scales in your images.
+If WormBox does not recognize the scale, it will ask you to set up the scale.
+Here are the steps you should take to fully complete the first part of this tutorial:
 
--   **Step 1**. Start Fiji/ImageJ and enable WormBox in the switch to
-    alternate macro tool sets (Figure 3).
+- **Step 1**. Start Fiji/ImageJ and enable WormBox in the switch to alternate macro tool sets (Figure 3).
 
-![](media/fig_3.jpg){.align-center
-width="400"} `
- <center>
-  <b>Figure 3</b>. Selecting WormBox tool sets.
- </center>
-`{=html}
+![](media/fig_3.jpg)
 
-Once the plugin is enabled, 5 new icons will become available to you
-with the following function:
+**Figure 3**. Selecting WormBox tool sets.
 
-![](media/fig_3a.jpg){.align-left width="15"}
-Initialize landmark setup and/or load ROI (Region of Interest) to
-images.\
-![](media/fig_3b.jpg){.align-left
-width="15"}Save landmark positions.\
-![\*](media/fig_3c.jpg){.align-left
-width="15"} Count meristic variable.\
-![\*](media/fig_3d.jpg){.align-left
-width="15"} Add new landmarks.\
-![\*](media/fig_3e.jpg){.align-left
-width="15"} Run WomBox Analyzer, to compile measurements to \*.cvs
-file.\
+Once the plugin is enabled, 5 new icons will become available to you with the following function:
 
--   **Step 2**. Open the first image of your working folder. You can do
-    that by either dragging the image into the Fiji/ImageJ main menu
-    area (gray area) or by using File/Open.
+- ![](media/fig_3a.jpg) Initialize landmark setup and/or load ROI (Region of Interest) to images.
+- ![](media/fig_3b.jpg) Save landmark positions.
+- ![](media/fig_3c.jpg) Count meristic variable.
+- ![](media/fig_3d.jpg) Add new landmarks.
+- ![](media/fig_3e.jpg) Run WomBox Analyzer, to compile measurements to .cvs file.
 
-![](media/fig_4.jpg){.align-center
-width="400"}
+- **Step 2**. Open the first image of your working folder. You can do that by either dragging the image into the Fiji/ImageJ main menu area (gray area) or by using File/Open.
 
-`
- <center>
-  <b>Figure 4</b>. Opening images in Fiji.
- </center>
-`{=html}
+![](media/fig_4.jpg)
 
-**NOTE:** Files should be in \*.tif format and the extension should be
-in lower case. WormBox will recognize all major images formats
-recognized by Fiji/ImageJ. However, if the original image is not in
-\*.tif format, or if the extension is written in upper case, WormBox
-will make a copy of the image and save it as \*.tif after processing.
+**Figure 4**. Opening images in Fiji.
 
-    ***Step 3**. Scaling images. If your images are not scaled by Fiji/ImageJ or, although scaled using a different software, Fiji/ImageJ did not recognize the scale, WormBox will require that a scale is provided and the warning window below will be presented.
+**NOTE:** Files should be in .tif format and the extension should be in lower case.
+WormBox will recognize all major images formats recognized by Fiji/ImageJ.
+However, if the original image is not in .tif format, or if the extension is written in upper case, WormBox will make a copy of the image and save it as .tif after processing.
+
+- **Step 3**. Scaling images. If your images are not scaled by Fiji/ImageJ or, although scaled using a different software, Fiji/ImageJ did not recognize the scale, WormBox will require that a scale is provided and the warning window below will be presented.
 
 ![](media/fig_5.jpg){.align-center
 width="300"} `

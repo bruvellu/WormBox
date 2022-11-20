@@ -33,3 +33,8 @@ If you encounter a bug or have suggestions for improvements please open an [issu
 
 - [Bruno C. Vellutini](https://brunovellutini.com/)
 - [Fernando P. L. Marques](http://lhe.ib.usp.br/lhe/)
+
+## Citation
+
+Bruno C. Vellutini, & Fernando P. L. Marques. (2022). WormBox: A Fiji plugin to measure linear distances. Zenodo. https://doi.org/10.5281/zenodo.7339356
+

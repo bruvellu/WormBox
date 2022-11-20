@@ -13,16 +13,12 @@ Be that as it may, give it a try.
 We will be happy if it turned out to be a good tool for your research.
 To download the most recent version of the plugin, [press here](https://github.com/bruvellu/WormBox).
 
-=== System requirements ===
+## System requirements
 
-As this application makes full usage of Fiji/ImageJ, which can be
-downloaded from [Fiji\'s website](http://fiji.sc/wiki/index.php/Fiji),
-as long as you meet the system requirements of Fiji/ImageJ, this
-application will work. Thus, before you start you should install
-Fiji/ImageJ. After installing Fiji/ImageJ, you should verify whether
-there are updates for Fiji and/or ImageJ available. To accomplish that,
-open the casting menus of Help in the main menu of Fiji/ImageJ and
-select the options to update both applications (Figure 1).
+As this application makes full usage of Fiji/ImageJ, which can be downloaded from [Fiji's website](http://fiji.sc/wiki/index.php/Fiji), as long as you meet the system requirements of Fiji/ImageJ, this application will work.
+Thus, before you start you should install Fiji/ImageJ.
+After installing Fiji/ImageJ, you should verify whether there are updates for Fiji and/or ImageJ available.
+To accomplish that, open the casting menus of Help in the main menu of Fiji/ImageJ and select the options to update both applications (Figure 1).
 
 ![](media/fig_1.jpg){.align-center
 width="150"} `
@@ -38,7 +34,7 @@ here](http://marcora.caltech.edu/jython_imagej_howto.htm)). We have not
 tried to do that and advise you to install Fiji/ImageJ, which seems to a
 much easier solution.\
 
-#### Installing the plugins
+## Installing
 
 After downloading WormBox.zip and decompressing the ZIP file, you will
 find two files within the folder: WormBox_Tools.txt and
@@ -55,7 +51,7 @@ WormBox_Analyzer.py to Fiji.app/plugins/.
         /Applications/Fiji.app/macros/toolsets/\';
     -   Execute \'cp WormBox\_.py /Applications/Fiji.app/plugins/\'.
 
-#### Planning your project
+## Planning your project
 
 \
 WormBox uses landmarks to compute linear distances. Thus, before you
@@ -81,7 +77,7 @@ defined 8 landmarks (Figure 2). WormBox allows you to set as many as
 landmarks as you need (or wish), but you should always be careful and
 minimize the amount of landmarks for practical reasons.\
 
-#### Getting started with WormBox
+## Getting started
 
 Once you have a good idea of the measurements you want to take and the
 landmarks required to do that, you should compile within a folder all
@@ -304,7 +300,7 @@ of the file will compile the average, standard deviation and sample size
 of each variable. Cells with "NA" (as Non Available) denote measurements
 that were not taken due to the lack of associated landmark(s).
 
-#### More on WormBox (advanced features)
+## Advanced features
 
 Now we will explore some other features of WormBox. We provide a folder
 called "proglottids" upon which we base this second part of the
@@ -332,7 +328,7 @@ width="200"} `
  </center>
 `{=html}
 
-##### Counting structures:
+### Counting structures:
 
 Before starting the use of the counting toll of WormBox, you should:
 
@@ -395,7 +391,7 @@ counting tool and repeating the steps you did before in which you count
 the aporal testes. You should repeat all the steps above for the other
 remaining (2) images.
 
-##### Compiling results (complex version)
+### Compiling results (complex version)
 
 As explained above, you will need to specify a configuration file to
 parse all the information you implemented in each image. Here we will

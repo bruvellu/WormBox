@@ -1,24 +1,18 @@
-## WormBox Tutorial
+# WormBox Tutorial
 
-WormBox (Vellutini & Marques, 2011-14) is a plugin to FIJI/ImageJ that
-was written with the intent to help you to automate the uptake of
-measurements from sets of images. This macro is based on plotting
-landmarks upon images from which a table with linear distances will be
-generated. You can also use it to count structures (*i.e.*, meristic
-variables). We have not tested how effective timewise this plugin will
-be in comparison to the traditional methods most people obtain
-measurements from specimens. We expect it will vary a lot among cases.
-Ultimately, it will all depend on how easy (and fast) you can produce
-images from which you can extract the measurements you need. If that is
-not an issue, we believe you will find that this application will speed
-up data gathering. You should also consider that, even if you do not
-speed up your work by using this application, using it will provide you
-with full documentation of your measurements \-- which usually is not
-the case by traditional methods. Be that as it may, give it a try. We
-will be happy if it turned out to be a good tool for your research. To
-download the most recent version of the plugin, [press
-here](https://github.com/nelas/WormBox).\
-\
+[**WormBox**](https://github.com/bruvellu/WormBox) (Vellutini & Marques, 2011--2022) is a plugin to Fiji/ImageJ that was written with the intent to help you to automate the uptake of measurements from sets of images.
+This macro is based on plotting landmarks upon images from which a table with linear distances will be
+generated.
+You can also use it to count structures (*i.e.*, meristic variables).
+We have not tested how effective timewise this plugin will be in comparison to the traditional methods most people obtain measurements from specimens.
+We expect it will vary a lot among cases.
+Ultimately, it will all depend on how easy (and fast) you can produce images from which you can extract the measurements you need.
+If that is not an issue, we believe you will find that this application will speed up data gathering.
+You should also consider that, even if you do not speed up your work by using this application, using it will provide you with full documentation of your measurements---which usually is not the case by traditional methods.
+Be that as it may, give it a try.
+We will be happy if it turned out to be a good tool for your research.
+To download the most recent version of the plugin, [press here](https://github.com/bruvellu/WormBox).
+
 === System requirements ===
 
 As this application makes full usage of Fiji/ImageJ, which can be

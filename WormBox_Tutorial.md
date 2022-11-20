@@ -20,12 +20,7 @@ Thus, before you start you should install Fiji/ImageJ.
 After installing Fiji/ImageJ, you should verify whether there are updates for Fiji and/or ImageJ available.
 To accomplish that, open the casting menus of Help in the main menu of Fiji/ImageJ and select the options to update both applications (Figure 1).
 
-![](media/fig_1.jpg){.align-center
-width="150"} `
- <center>
-  <b>Figure 1</b>. Options of updates in the main menu of Fiji/ImageJ.
- </center>
-`{=html}
+![**Figure 1**. Options of updates in the main menu of Fiji/ImageJ.](media/fig_1.jpg)
 
 **NOTE:** WormBox will not work in ImageJ as distributed because this
 plugin requires Jython. However, you can make ImageJ capable of dealing

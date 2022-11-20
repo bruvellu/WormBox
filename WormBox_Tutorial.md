@@ -30,7 +30,7 @@ there are updates for Fiji and/or ImageJ available. To accomplish that,
 open the casting menus of Help in the main menu of Fiji/ImageJ and
 select the options to update both applications (Figure 1).
 
-![](/wiki/techniques/wormbox_images/fig_1.jpg){.align-center
+![](media/fig_1.jpg){.align-center
 width="150"} `
  <center>
   <b>Figure 1</b>. Options of updates in the main menu of Fiji/ImageJ.
@@ -73,7 +73,7 @@ WormBox by using an example in which our goal is to obtain measurements
 from a set of hooks for *Potamotrygonocestus* (a onchobothriid cestode).
 With this example we hope to demonstrate how WormBox can be helpful.
 
-![](/wiki/techniques/wormbox_images/fig_2.jpg){.align-center
+![](media/fig_2.jpg){.align-center
 width="300"} `
  <center>
   <b>Figure 2</b>. Definition of landmarks upon handles and prongs of internal and lateral bothridial hooks of <i>Potamotrygonocestus</i>.
@@ -99,12 +99,12 @@ scaled, preferentially using ImageJ or Fiji/ImageJ. WormBox will inform
 you whether it recognized the scales in your images. If WormBox does not
 recognize the scale, it will ask you to set up the scale. Here are the
 steps you should take to fully complete the first part of this tutorial
-(![PDF](/wiki/techniques/wormbox_images/wormbox_tutorial.pdf)):
+(![PDF](media/wormbox_tutorial.pdf)):
 
 -   **Step 1**. Start Fiji/ImageJ and enable WormBox in the switch to
     alternate macro tool sets (Figure 3).
 
-![](/wiki/techniques/wormbox_images/fig_3.jpg){.align-center
+![](media/fig_3.jpg){.align-center
 width="400"} `
  <center>
   <b>Figure 3</b>. Selecting WormBox tool sets.
@@ -114,16 +114,16 @@ width="400"} `
 Once the plugin is enabled, 5 new icons will become available to you
 with the following function:
 
-![](/wiki/techniques/wormbox_images/fig_3a.jpg){.align-left width="15"}
+![](media/fig_3a.jpg){.align-left width="15"}
 Initialize landmark setup and/or load ROI (Region of Interest) to
 images.\
-![](/wiki/techniques/wormbox_images/fig_3b.jpg){.align-left
+![](media/fig_3b.jpg){.align-left
 width="15"}Save landmark positions.\
-![\*](/wiki/techniques/wormbox_images/fig_3c.jpg){.align-left
+![\*](media/fig_3c.jpg){.align-left
 width="15"} Count meristic variable.\
-![\*](/wiki/techniques/wormbox_images/fig_3d.jpg){.align-left
+![\*](media/fig_3d.jpg){.align-left
 width="15"} Add new landmarks.\
-![\*](/wiki/techniques/wormbox_images/fig_3e.jpg){.align-left
+![\*](media/fig_3e.jpg){.align-left
 width="15"} Run WomBox Analyzer, to compile measurements to \*.cvs
 file.\
 
@@ -131,7 +131,7 @@ file.\
     that by either dragging the image into the Fiji/ImageJ main menu
     area (gray area) or by using File/Open.
 
-![](/wiki/techniques/wormbox_images/fig_4.jpg){.align-center
+![](media/fig_4.jpg){.align-center
 width="400"}
 
 `
@@ -148,7 +148,7 @@ will make a copy of the image and save it as \*.tif after processing.
 
     ***Step 3**. Scaling images. If your images are not scaled by Fiji/ImageJ or, although scaled using a different software, Fiji/ImageJ did not recognize the scale, WormBox will require that a scale is provided and the warning window below will be presented.
 
-![](/wiki/techniques/wormbox_images/fig_5.jpg){.align-center
+![](media/fig_5.jpg){.align-center
 width="300"} `
  <center>
   <b>Figure 5</b>. Request for providing a scale by WormBox.
@@ -159,7 +159,7 @@ To scale the image in Fiji/ImageJ you will have to follow these steps:
 
 -   **Step 3a** Select the \"straight\" tool to draw lines. =
 
-![](/wiki/techniques/wormbox_images/fig_6.jpg){.align-center
+![](media/fig_6.jpg){.align-center
 width="300"} `
  <center>
   <b>Figure 6</b>. Selecting the straight line tool in ImageJ.
@@ -177,7 +177,7 @@ width="300"} `
 
 and the unity of the length (*i.e.*, *um*).
 
-![](/wiki/techniques/wormbox_images/fig_7.jpg){.align-center
+![](media/fig_7.jpg){.align-center
 width="250"} `
  <center>
   <b>Figure 7</b>. Set scale menu in ImageJ.
@@ -195,7 +195,7 @@ work in each image.
     time you are using WormBox for the images within a given folder you
     will have to define the number of landmarks you will be working.
 
-![](/wiki/techniques/wormbox_images/fig_8.jpg){.align-center
+![](media/fig_8.jpg){.align-center
 width="250"} `
  <center>
   <b>Figure 8</b>. Defining the number of landmarks in WormBox.
@@ -209,7 +209,7 @@ be used for all images in this folder (Figure 9A). A file called
 RoiSet.zip will be created and all landmarks will appear on the left
 part of the image.
 
-![](/wiki/techniques/wormbox_images/fig_9.jpg){.align-center
+![](media/fig_9.jpg){.align-center
 width="500"} `
  <center>
   <b>Figure 9</b>. <b>A</b>, landmark pasted on image after defining numbers of landmarks or loading template. <b>B</b>, landmarks placed in desired positions.
@@ -230,7 +230,7 @@ REMOVED** -- unless you want to wipe out all the data. If you desire to
 verify and or modify the positions of the landmarks, just reload the ROI
 using the icon in the macro tool set menu of WormBox.
 
-![](/wiki/techniques/wormbox_images/fig_9b_note.jpg){.align-right
+![](media/fig_9b_note.jpg){.align-right
 width="100"}\
 \
 **NOTE:** WormBox allows you to delete any landmark if you feel that a
@@ -285,7 +285,7 @@ definition of icons above). First, WormBox will ask you the target
 folder in which your images have been processed (Figure 10A); and then
 the name of your configuration file (Figure 10B).
 
-![](/wiki/techniques/wormbox_images/fig_10.jpg){.align-center
+![](media/fig_10.jpg){.align-center
 width="450"} `
  <center>
   <b>Figure 10</b>. <b>A</b>, menu for selecting target folder. <b>B</b>, menu to specify configuration file.
@@ -297,7 +297,7 @@ generate a \*.csv (comma separated values) text file that can be opened
 in any spreadsheet software (*e.g.*, Excel, OpenOffice, among others) as
 demonstrated in Figure 11.
 
-![](/wiki/techniques/wormbox_images/fig_11.jpg){.align-center
+![](media/fig_11.jpg){.align-center
 width="600"} `
  <center>
   <b>Figure 11</b>. Summary results from WormBox showed by opening the *.csv file in OpenOffice Spreadsheet.
@@ -331,7 +331,7 @@ tutorial. It is true that the configuration file will have to specify
 that; which will be addressed latter. Thus, let\'s see how we count
 structures using WormBox.
 
-![](/wiki/techniques/wormbox_images/fig_12.jpg){.align-center
+![](media/fig_12.jpg){.align-center
 width="200"} `
  <center>
   <b>Figure 12</b>. Landmarks on loose proglottids of<i>Potamotrygonocestus</i>.
@@ -353,7 +353,7 @@ meristic variables (icon with Σ sign). By doing that, you will turn on
 the multi-point tool of Fiji/ImageJ and a window named "action required"
 will appear.
 
-![](/wiki/techniques/wormbox_images/fig_13.jpg){.align-center
+![](media/fig_13.jpg){.align-center
 width="400"} `
  <center>
   <b>Figure 13</b>. Enabling the multi-point tool of Fiji/ImageJ.
@@ -366,7 +366,7 @@ Here, we will count two sets of testes: poral and aporal ones. As you
 start clicking on top of the testes, let\'s say on the aporal side,
 landmarks in yellow will provide the counting (Figure 14).
 
-![](/wiki/techniques/wormbox_images/fig_14.jpg){.align-center
+![](media/fig_14.jpg){.align-center
 width="350"} `
  <center>
   <b>Figure 14</b>. Image showing landmarks in blue and counting unities in yellow for partial counts of aporal testes.
@@ -387,7 +387,7 @@ start by loading all you have done thus far by pressing the icon to load
 ROI into image. If you load the ROI, you should have something like
 Figure 15.
 
-![](/wiki/techniques/wormbox_images/fig_15.jpg){.align-center
+![](media/fig_15.jpg){.align-center
 width="400"} `
  <center>
   <b>Figure 15</b>. Summary information after loading ROI at this point.
@@ -473,7 +473,7 @@ Examples of that are the testes counts defined in "aporal_testes" and
 
 The final results should be something like this:
 
-![](/wiki/techniques/wormbox_images/fig_16.jpg){.align-center
+![](media/fig_16.jpg){.align-center
 width="600"} `
  <center>
   <b>Figure 16</b>. Summary results from WormBox showed by opening the *.csv file in OpenOffice Spreadsheet.

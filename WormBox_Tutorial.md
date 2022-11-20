@@ -480,16 +480,3 @@ width="600"} `
  </center>
 `{=html}\
 
-[^1]: <http://en.wikipedia.org/wiki/Log-normal_distribution>
-
-[^2]: bars are rectangles, then to get their areas multiply their width
-    and height
-
-[^3]: for continuous measures the sum is replaced by an integral, which
-    is a limit of a sum
-
-[^4]: Akaike information criterion
-
-[^5]: You can try yourself downloading the input files used in the
-    examples above from
-    ![here](/wiki/techniques/morphometrics/input_files.zip).

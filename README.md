@@ -28,3 +28,8 @@ respective directories inside your Fiji folder:
 
 For the latest and most-complete usage guide, please visit this
 [tutorial](http://lhe.ib.usp.br/lhe/doku.php?id=tech#wormbox_v_10).
+
+## Authors
+
+- [Bruno C. Vellutini](https://brunovellutini.com/)
+- [Fernando P. L. Marques](http://lhe.ib.usp.br/lhe/)

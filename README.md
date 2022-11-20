@@ -24,9 +24,10 @@ respective directories inside your Fiji folder:
 * `WormBox_Tools.txt` to `Fiji/macros/toolsets/`
 * `WormBox_Analyzer.py` to `Fiji/plugins/`
 
-## Tutorial
+## Documentation
 
-Instructions on how to use the WormBox plugin are available in our [tutorial](Tutorial_WormBox.md). If you encounter a bug or have suggestions for improvements feel free to open an [issue](https://github.com/bruvellu/WormBox/issues) or contact us directly.
+Check our [tutorial](WormBox_Tutorial.md) for instructions on how to use the WormBox plugin.
+If you encounter a bug or have suggestions for improvements please open an [issue](https://github.com/bruvellu/WormBox/issues).
 
 ## Authors
 

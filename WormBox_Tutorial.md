@@ -1,47 +1,17 @@
 # WormBox Tutorial
 
-[**WormBox**](https://github.com/bruvellu/WormBox) (Vellutini & Marques, 2011--2022) is a plugin to Fiji/ImageJ that was written with the intent to help you to automate the uptake of measurements from sets of images.
-This macro is based on plotting landmarks upon images from which a table with linear distances will be
-generated.
-You can also use it to count structures (*i.e.*, meristic variables).
-We have not tested how effective timewise this plugin will be in comparison to the traditional methods most people obtain measurements from specimens.
-We expect it will vary a lot among cases.
-Ultimately, it will all depend on how easy (and fast) you can produce images from which you can extract the measurements you need.
-If that is not an issue, we believe you will find that this application will speed up data gathering.
-You should also consider that, even if you do not speed up your work by using this application, using it will provide you with full documentation of your measurements---which usually is not the case by traditional methods.
-Be that as it may, give it a try.
-We will be happy if it turned out to be a good tool for your research.
-To download the most recent version of the plugin, [press here](https://github.com/bruvellu/WormBox).
-
-## System requirements
-
-As this application makes full usage of Fiji/ImageJ, which can be downloaded from [Fiji's website](http://fiji.sc/wiki/index.php/Fiji), as long as you meet the system requirements of Fiji/ImageJ, this application will work.
-Thus, before you start you should install Fiji/ImageJ.
-After installing Fiji/ImageJ, you should verify whether there are updates for Fiji and/or ImageJ available.
-To accomplish that, open the casting menus of Help in the main menu of Fiji/ImageJ and select the options to update both applications (Figure 1).
+[**WormBox**](https://github.com/bruvellu/WormBox) (Vellutini & Marques, 2011–2022) is a [Fiji](http://fiji.sc/) plugin to help automating and documenting the measurement of linear distances based on landmarks.
+It can also be used to count structures (*i.e.*, meristic variables).
+You can specify custom measurements and the data are exported in plain text table format.
+Landmarks are saved as ROISets alongside your images to enable revisions and full reproducibility of your measurements.
+We hope that WormBox will speed up your data gathering and that it turns out to be a good tool for your research.
+For system requirements and installation instructions please click [here](https://github.com/bruvellu/WormBox).
+After installing Fiji and WormBox verify whether there are updates available.
+For that, open the Help menu and select the options to update Fiji (Figure 1).
 
 ![](media/fig_1.jpg)
 
-**Figure 1**. Options of updates in the main menu of Fiji/ImageJ.
-
-**NOTE:** WormBox will not work in ImageJ as distributed because this plugin requires Jython.
-However, you can make ImageJ capable of dealing with WormBox by installing Jython in your system ([see here](http://marcora.caltech.edu/jython_imagej_howto.htm)).
-We have not tried to do that and advise you to install Fiji/ImageJ, which seems to a much easier solution.
-
-## Installing
-
-After downloading WormBox.zip and decompressing the ZIP file, you will find two files within the folder: WormBox_Tools.txt and WormBox_Analyzer.py.
-These files are the scripts of WormBox and will have to be moved to specific locations within Fiji/ImageJ\'s folders.
-Thus, move WormBox_Tools.txt to Fiji.app/macros/toolsets/ and WormBox_Analyzer.py to Fiji.app/plugins/.
-
-**NOTE:** MAC users could use the terminal to accomplish this task.
-
--   Open the Terminal application;
--   Move to the folder where WormBox.txt and WormBox\_.py are
-    located (e.g., cd Desktop/WormBox);
--   Execute \'cp WormBox.txt
-    /Applications/Fiji.app/macros/toolsets/\';
--   Execute \'cp WormBox\_.py /Applications/Fiji.app/plugins/\'.
+**Figure 1**. Update options in the main menu of Fiji.
 
 ## Planning your project
 

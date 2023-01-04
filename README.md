@@ -26,5 +26,5 @@ A Fiji/ImageJ plugin to automate and document measurements of linear distances.
 
 ## Citation
 
-Bruno C. Vellutini & Fernando P. L. Marques. (2022). WormBox: A Fiji plugin to measure linear distances. Zenodo. https://doi.org/10.5281/zenodo.7339356
+Bruno C. Vellutini & Fernando P. L. Marques. (2011). WormBox: A Fiji plugin to measure linear distances. Zenodo. https://doi.org/10.5281/zenodo.7339356
 

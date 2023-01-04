@@ -4,7 +4,7 @@ A Fiji/ImageJ plugin to automate and document measurements of linear distances.
 
 ## Requirements
 
-- [Fiji](http://fiji.sc/) (or [ImageJ](http://rsbweb.nih.gov/ij/) with Jython).
+- [Fiji](http://fiji.sc/)
 
 ## Installation
 
@@ -18,8 +18,6 @@ A Fiji/ImageJ plugin to automate and document measurements of linear distances.
 ## Documentation
 
 - [WormBox Tutorial](WormBox_Tutorial.md)
-
-If you encounter a bug or have suggestions please open an [issue](https://github.com/bruvellu/WormBox/issues).
 
 ## Authors
 

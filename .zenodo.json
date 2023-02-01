@@ -10,8 +10,6 @@
         }
     ],
 
-    "license": "GNU General Public License v3.0",
-
     "publication_date": "2011-09-22",
 
     "title": "WormBox: A Fiji plugin to measure linear distances",

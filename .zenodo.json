@@ -1,0 +1,23 @@
+{
+    "creators": [
+        {
+            "orcid": "0000-0002-0000-9465",
+            "name": "Bruno C. Vellutini"
+        },
+        {
+            "orcid": "0000-0002-4281-8711",
+            "name": "Fernando P. L. Marques"
+        }
+    ],
+
+    "license": "GNU General Public License v3.0",
+
+    "publication_date": "2011-09-22",
+
+    "title": "WormBox: A Fiji plugin to measure linear distances",
+
+    "description": "A Fiji/ImageJ plugin to automate and document the measurement of linear distances using landmarks. Originally developed and released in 2011.",
+
+    "keywords": ["Fiji", "ImageJ"]
+
+}
